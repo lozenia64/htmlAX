@@ -445,15 +445,49 @@
         max-width: 960px;
         min-width: 0;
       }
-      /* 접힘: 영상 우측에 작은 카드(헤더만) */
-      .player-main.has-pdf #pdf-section {
+      /* 접힘: 영상 우측 '중앙'에 떠 있는 원형 문서 버튼
+         (#pdf-section 높이를 영상 높이에 맞춰 JS로 동기화 → FAB가 영상 세로 중앙에 정렬) */
+      .player-main.has-pdf:not(.is-pdf-open) #pdf-section {
         flex: 0 0 auto;
-        width: 240px;
-        max-width: 240px;
+        width: auto;
+        max-width: none;
         align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header {
+        width: 56px;
+        min-width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        color: var(--accent);
+        transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header:hover {
+        background: var(--accent-soft);
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-1px);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-title,
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-chevron {
+        display: none;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-icon {
+        display: inline-flex;
       }
       /* 펼침: 읽기 컬럼으로 확장, 영상 높이에 맞춰 늘어남 */
       .player-main.is-pdf-open #pdf-section {
+        flex: 0 0 auto;
         width: clamp(360px, 38%, 680px);
         max-width: 680px;
         align-self: stretch;
@@ -482,6 +516,7 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
       background: transparent;
+      cursor: pointer;
     }
 
     /* 원본 해상도 width ≥ 960px 인 영상은 항상 960px 너비로 표시 */
@@ -760,6 +795,20 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .pdf-card-icon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .pdf-card-icon svg {
+      width: 24px;
+      height: 24px;
     }
 
     .pdf-card-chevron {
@@ -1060,7 +1109,15 @@
         </div>
 
       <section id="pdf-section" class="pdf-panel" hidden aria-label="과제 설명 PDF">
-        <button type="button" id="pdf-card-toggle" class="pdf-card-header" aria-expanded="false" aria-controls="pdf-card-body">
+        <button type="button" id="pdf-card-toggle" class="pdf-card-header" aria-expanded="false" aria-controls="pdf-card-body" aria-label="과제 설명 PDF">
+          <span class="pdf-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </span>
           <span class="pdf-card-title">과제 설명 (PDF)</span>
           <span class="pdf-card-chevron" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1480,6 +1537,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.pdfCardToggle.setAttribute('aria-expanded', 'false');
         els.playerMain.classList.add('has-pdf');
         els.pdfPageInfo.textContent = '1 / —';
+        player.syncFabPosition();
       },
 
       toggleExpand: function () {
@@ -1495,6 +1553,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.pdfCardBody.hidden = false;
         els.pdfCardToggle.setAttribute('aria-expanded', 'true');
         els.playerMain.classList.add('is-pdf-open');
+        player.syncFabPosition();
         if (!this.doc && this.pendingPath) {
           this.loadDocument(this.pendingPath);
         } else if (this.doc) {
@@ -1510,6 +1569,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.pdfCardBody.hidden = true;
         els.pdfCardToggle.setAttribute('aria-expanded', 'false');
         els.playerMain.classList.remove('is-pdf-open');
+        player.syncFabPosition();
         routing.writeState();
       },
 
@@ -1653,6 +1713,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           self.next();
         });
         window.addEventListener('resize', function () {
+          player.syncFabPosition();
           if (els.pdfSection.hidden || !self.doc || !self.expanded) return;
           self.renderPage();
         });
@@ -1903,6 +1964,21 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.videoWrap.classList.add('is-hd-wide');
         } else {
           els.videoWrap.classList.remove('is-hd-wide');
+        }
+        this.syncFabPosition();
+      },
+
+      /** 접힘 상태의 PDF FAB를 영상 세로 중앙에 맞춘다 (영상 높이로 컨테이너 높이 동기화) */
+      syncFabPosition: function () {
+        var section = els.pdfSection;
+        if (!section || section.hidden) return;
+        var desktop = window.matchMedia('(min-width: 1024px)').matches;
+        var collapsed = !els.playerMain.classList.contains('is-pdf-open');
+        if (desktop && collapsed) {
+          var h = els.videoWrap.getBoundingClientRect().height;
+          if (h > 0) section.style.height = h + 'px';
+        } else {
+          section.style.removeProperty('height');
         }
       },
 
@@ -2322,6 +2398,10 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         });
 
         els.btnPlay.addEventListener('click', function () {
+          self.togglePlay();
+        });
+
+        els.videoWrap.addEventListener('click', function () {
           self.togglePlay();
         });
 
