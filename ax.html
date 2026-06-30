@@ -668,6 +668,141 @@
       background: rgba(22, 163, 74, 0.88);
     }
 
+    /* 캐시 상태 핀(카드 좌하단) */
+    .card-cache {
+      position: absolute;
+      left: 0.75rem;
+      bottom: 0.75rem;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: rgba(15, 23, 42, 0.66);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .card-cache[hidden] {
+      display: none;
+    }
+
+    .card-cache.is-cached {
+      background: rgba(22, 163, 74, 0.9);
+    }
+
+    /* 캐시 바(대시보드 헤더) */
+    .cache-bar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.625rem 0.875rem;
+      margin-top: 1.25rem;
+    }
+
+    .cache-bar[hidden] {
+      display: none;
+    }
+
+    .btn-cache {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid rgba(79, 70, 229, 0.2);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      min-height: 2.25rem;
+      box-shadow: var(--shadow-sm);
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .btn-cache svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .btn-cache:hover:not(:disabled) {
+      background: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-cache:disabled {
+      cursor: default;
+    }
+
+    .btn-cache.is-complete {
+      background: rgba(22, 163, 74, 0.1);
+      border-color: rgba(22, 163, 74, 0.3);
+      color: #15803d;
+    }
+
+    .btn-cache.is-running {
+      background: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-cache:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .prefetch-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1 1 200px;
+      min-width: 160px;
+      max-width: 24rem;
+    }
+
+    .prefetch-progress[hidden] {
+      display: none;
+    }
+
+    .prefetch-track {
+      flex: 1;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--border);
+      overflow: hidden;
+    }
+
+    .prefetch-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: 3px;
+      transition: width 200ms var(--ease);
+    }
+
+    .prefetch-text {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      max-width: 14rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .storage-info {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .storage-info[hidden] {
+      display: none;
+    }
+
     /* Player */
     .player-header {
       display: flex;
@@ -1364,6 +1499,22 @@
         <div id="stats-strip" class="stats-strip" hidden>
           <span id="stats-count"></span>
         </div>
+        <div id="cache-bar" class="cache-bar" hidden>
+          <button type="button" id="btn-prefetch" class="btn-cache">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            <span id="prefetch-label">모든 시연 미리 받기</span>
+          </button>
+          <div id="prefetch-progress" class="prefetch-progress" hidden>
+            <div class="prefetch-track"><div id="prefetch-fill" class="prefetch-fill"></div></div>
+            <span id="prefetch-text" class="prefetch-text"></span>
+          </div>
+          <span id="storage-info" class="storage-info" hidden></span>
+          <button type="button" id="btn-clear-cache" class="text-btn" hidden>전체 캐시 비우기</button>
+        </div>
       </div>
     </header>
     <main class="dashboard-main">
@@ -1625,6 +1776,20 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             tx.onerror = function () { reject(tx.error); };
           });
         });
+      },
+
+      /** 저장된 모든 키 목록 (blob 본체는 읽지 않음 → 가벼움) */
+      keys: function () {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve) {
+            var tx = db.transaction(videoStore.storeName, 'readonly');
+            var req = tx.objectStore(videoStore.storeName).getAllKeys();
+            req.onsuccess = function () { resolve(req.result || []); };
+            req.onerror = function () { resolve([]); };
+          });
+        }).catch(function () {
+          return [];
+        });
       }
     };
 
@@ -1635,6 +1800,14 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       cardGrid: document.getElementById('card-grid'),
       statsStrip: document.getElementById('stats-strip'),
       statsCount: document.getElementById('stats-count'),
+      cacheBar: document.getElementById('cache-bar'),
+      btnPrefetch: document.getElementById('btn-prefetch'),
+      prefetchLabel: document.getElementById('prefetch-label'),
+      prefetchProgress: document.getElementById('prefetch-progress'),
+      prefetchFill: document.getElementById('prefetch-fill'),
+      prefetchText: document.getElementById('prefetch-text'),
+      storageInfo: document.getElementById('storage-info'),
+      btnClearCache: document.getElementById('btn-clear-cache'),
       btnPickFolder: document.getElementById('btn-pick-folder'),
       folderInput: document.getElementById('folder-input'),
       catalogToolbar: document.getElementById('catalog-toolbar'),
@@ -2250,6 +2423,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
                 '<path d="M8 5v14l11-7z"/>' +
               '</svg>' +
             '</div>' +
+            '<span class="card-cache" hidden></span>' +
             progressHtml +
           '</div>' +
           '<div class="card-body"><p class="card-title"></p></div>';
@@ -2270,6 +2444,27 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         });
 
         return card;
+      },
+
+      /** 현재 메모리 캐시맵 기준으로 모든 카드의 '저장됨/미저장' 핀 갱신 */
+      refreshCacheBadges: function () {
+        var disabled = cacheManager.disabled;
+        var cards = document.querySelectorAll('#card-grid .card, #continue-row .card');
+        cards.forEach(function (card) {
+          var badge = card.querySelector('.card-cache');
+          if (!badge) return;
+          var video = state.videos[parseInt(card.dataset.index, 10)];
+          var cacheable = video && video.source === 'embedded' &&
+            video.src && video.src.indexOf('blob:') !== 0;
+          if (disabled || !cacheable) {
+            badge.hidden = true;
+            return;
+          }
+          var cached = !!cacheManager.cachedKeys[video.src];
+          badge.hidden = false;
+          badge.classList.toggle('is-cached', cached);
+          badge.textContent = cached ? '저장됨' : '미저장';
+        });
       },
 
       collectCategories: function () {
@@ -2351,6 +2546,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.continueRow.appendChild(self.createCard(e.video, e.index));
         });
         els.continueSection.hidden = false;
+        this.refreshCacheBadges();
       },
 
       /** 현재 필터/정렬을 본 그리드에 반영 */
@@ -2388,6 +2584,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.statsCount.textContent = filtering
           ? '총 ' + total + '개 중 ' + shown + '개 표시'
           : '총 ' + total + '개 시연 영상';
+
+        this.refreshCacheBadges();
       },
 
       render: function () {
@@ -2400,6 +2598,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.continueSection.hidden = true;
           els.gridHeading.hidden = true;
           els.noResults.hidden = true;
+          els.cacheBar.hidden = true;
           els.cardGrid.hidden = false;
           els.cardGrid.innerHTML = '';
           return;
@@ -2423,6 +2622,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.gridHeading.hidden = els.continueSection.hidden;
 
         this.applyFilters();
+        cacheBar.refresh();
       },
 
       bindControls: function () {
@@ -2732,10 +2932,15 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         }
       },
 
-      fetchResponseToBlob: function (response) {
+      fetchResponseToBlob: function (response, onProgress) {
         var self = this;
         var total = parseInt(response.headers.get('Content-Length') || '0', 10);
         var mime = response.headers.get('Content-Type') || 'video/mp4';
+
+        function report(loaded) {
+          if (onProgress) onProgress(loaded, total);
+          else self.updateDownloadProgress(loaded, total);
+        }
 
         function validateSize(blob) {
           if (total > 0 && Math.abs(blob.size - total) > 4096) {
@@ -2757,7 +2962,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             }
             chunks.push(result.value);
             loaded += result.value.byteLength;
-            self.updateDownloadProgress(loaded, total);
+            report(loaded);
             return pump();
           });
         }
@@ -3144,11 +3349,266 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       }
     };
 
+    function formatBytes(n) {
+      if (!n || n < 0) return '0 B';
+      var units = ['B', 'KB', 'MB', 'GB', 'TB'];
+      var i = 0;
+      var v = n;
+      while (v >= 1024 && i < units.length - 1) { v /= 1024; i++; }
+      return (v >= 10 || i === 0 ? Math.round(v) : v.toFixed(1)) + ' ' + units[i];
+    }
+
+    /**
+     * 오프라인 시연 안정성 — IndexedDB 캐시 가시화 + 일괄 사전 다운로드(프리페치).
+     * 캐시 키는 영상 경로(video.src)와 동일(기존 fetchAndCacheVideo 와 호환).
+     * file:// 환경은 fetch 프리페치가 불가하므로 비활성화.
+     */
+    var cacheManager = {
+      cachedKeys: {},
+      disabled: location.protocol === 'file:',
+      running: false,
+      aborter: null,
+
+      /** 캐시 대상(임베디드, blob 아님) 영상 목록 */
+      cacheableVideos: function () {
+        return state.videos.filter(function (v) {
+          return v.source === 'embedded' && v.src && v.src.indexOf('blob:') !== 0;
+        });
+      },
+
+      /** IndexedDB 키 목록으로 메모리 캐시맵 갱신 */
+      refresh: function () {
+        var self = this;
+        if (this.disabled) {
+          this.cachedKeys = {};
+          return Promise.resolve();
+        }
+        return videoStore.keys().then(function (keys) {
+          var map = {};
+          keys.forEach(function (k) { map[k] = true; });
+          self.cachedKeys = map;
+        }).catch(function () {
+          self.cachedKeys = self.cachedKeys || {};
+        });
+      },
+
+      isCached: function (key) {
+        return !!(this.cachedKeys && this.cachedKeys[key]);
+      },
+
+      estimate: function () {
+        if (!navigator.storage || !navigator.storage.estimate) {
+          return Promise.resolve(null);
+        }
+        return navigator.storage.estimate().catch(function () { return null; });
+      },
+
+      /** 단일 영상 다운로드 후 IndexedDB 저장 */
+      download: function (key, onProgress, signal) {
+        var opts = signal ? { signal: signal } : undefined;
+        return fetch(key, opts).then(function (response) {
+          if (!response.ok) throw new Error('download failed ' + response.status);
+          var total = parseInt(response.headers.get('Content-Length') || '0', 10);
+          return player.fetchResponseToBlob(response, onProgress).then(function (result) {
+            return videoStore.put(key, result.blob, total || result.size);
+          });
+        });
+      },
+
+      /** 미저장 영상 전체를 순차 다운로드. handlers 로 진행 상황 콜백 */
+      prefetchAll: function (handlers) {
+        var self = this;
+        handlers = handlers || {};
+        if (this.running || this.disabled) return;
+        var targets = this.cacheableVideos().filter(function (v) {
+          return !self.isCached(v.src);
+        });
+        if (targets.length === 0) {
+          if (handlers.onEmpty) handlers.onEmpty();
+          return;
+        }
+        this.running = true;
+        this.aborter = ('AbortController' in window) ? new AbortController() : null;
+        var signal = this.aborter ? this.aborter.signal : null;
+        var done = 0;
+        var failed = 0;
+        if (handlers.onStart) handlers.onStart(targets.length);
+
+        function step(i) {
+          if (!self.running) {
+            if (handlers.onAbort) handlers.onAbort(done, targets.length);
+            self.finishRun();
+            return;
+          }
+          if (i >= targets.length) {
+            if (handlers.onDone) handlers.onDone(done, failed, targets.length);
+            self.finishRun();
+            return;
+          }
+          var v = targets[i];
+          if (handlers.onItemStart) handlers.onItemStart(i, targets.length, v);
+          self.download(v.src, function (loaded, total) {
+            var pct = total > 0 ? Math.round(loaded / total * 100) : 0;
+            if (handlers.onItemProgress) handlers.onItemProgress(i, targets.length, v, pct);
+          }, signal).then(function () {
+            done++;
+            self.cachedKeys[v.src] = true;
+            if (handlers.onItemDone) handlers.onItemDone(v);
+          }).catch(function () {
+            if (signal && signal.aborted) {
+              self.running = false;
+            } else {
+              failed++;
+            }
+          }).then(function () {
+            step(i + 1);
+          });
+        }
+        step(0);
+      },
+
+      finishRun: function () {
+        this.running = false;
+        this.aborter = null;
+      },
+
+      abort: function () {
+        if (!this.running) return;
+        this.running = false;
+        if (this.aborter) {
+          try { this.aborter.abort(); } catch (e) { /* ignore */ }
+        }
+      },
+
+      clearAll: function () {
+        var self = this;
+        return videoStore.keys().then(function (keys) {
+          return Promise.all(keys.map(function (k) {
+            return videoStore.remove(k);
+          }));
+        }).then(function () {
+          Object.keys(sessionBlobUrls).forEach(function (k) {
+            if (k.indexOf('blob:') !== 0) {
+              try { URL.revokeObjectURL(sessionBlobUrls[k]); } catch (e) { /* ignore */ }
+              delete sessionBlobUrls[k];
+            }
+          });
+          state.videoSourceAttached = null;
+          self.cachedKeys = {};
+        });
+      }
+    };
+
+    var cacheBar = {
+      bind: function () {
+        els.btnPrefetch.addEventListener('click', function () {
+          if (cacheManager.running) {
+            cacheManager.abort();
+          } else {
+            cacheBar.startPrefetch();
+          }
+        });
+        els.btnClearCache.addEventListener('click', function () {
+          if (cacheManager.running) return;
+          if (!window.confirm('저장된 모든 영상 캐시를 삭제할까요? 다음 재생 시 다시 받습니다.')) return;
+          cacheManager.clearAll().then(function () {
+            return cacheManager.refresh();
+          }).then(function () {
+            dashboard.refreshCacheBadges();
+            cacheBar.updateSummary();
+          });
+        });
+      },
+
+      /** 대시보드 렌더 시 호출: 바 노출 여부 + 비동기 캐시 상태 반영 */
+      refresh: function () {
+        if (cacheManager.disabled || cacheManager.cacheableVideos().length === 0) {
+          els.cacheBar.hidden = true;
+          return;
+        }
+        els.cacheBar.hidden = false;
+        cacheManager.refresh().then(function () {
+          dashboard.refreshCacheBadges();
+          cacheBar.updateSummary();
+        });
+      },
+
+      updateSummary: function () {
+        if (cacheManager.running) return;
+        var cacheable = cacheManager.cacheableVideos();
+        var total = cacheable.length;
+        var cached = 0;
+        cacheable.forEach(function (v) {
+          if (cacheManager.cachedKeys[v.src]) cached++;
+        });
+        var allCached = total > 0 && cached === total;
+
+        els.btnPrefetch.disabled = allCached;
+        els.btnPrefetch.classList.toggle('is-complete', allCached);
+        els.btnPrefetch.classList.remove('is-running');
+        els.prefetchLabel.textContent = allCached ? '모든 시연 저장됨' : '모든 시연 미리 받기';
+        els.prefetchProgress.hidden = true;
+        els.btnClearCache.hidden = cached === 0;
+
+        cacheManager.estimate().then(function (est) {
+          var parts = ['영상 ' + cached + '/' + total + '개 저장'];
+          if (est && est.usage) parts.push(formatBytes(est.usage) + ' 사용');
+          els.storageInfo.textContent = parts.join(' · ');
+          els.storageInfo.hidden = false;
+        });
+      },
+
+      startPrefetch: function () {
+        cacheManager.prefetchAll({
+          onStart: function (n) {
+            els.btnPrefetch.classList.remove('is-complete');
+            els.btnPrefetch.classList.add('is-running');
+            els.prefetchLabel.textContent = '받기 중단';
+            els.prefetchProgress.hidden = false;
+            els.btnClearCache.hidden = true;
+            cacheBar.setProgress(0, '0 / ' + n);
+          },
+          onItemStart: function (i, n, v) {
+            cacheBar.setProgress(Math.round(i / n * 100), (i + 1) + ' / ' + n + ' · ' + v.title);
+          },
+          onItemProgress: function (i, n, v, pct) {
+            var overall = Math.round(((i + pct / 100) / n) * 100);
+            cacheBar.setProgress(overall, (i + 1) + ' / ' + n + ' · ' + pct + '%');
+          },
+          onItemDone: function () {
+            dashboard.refreshCacheBadges();
+          },
+          onDone: function (done, failed) {
+            cacheBar.endPrefetch(failed > 0 ? (failed + '개 실패') : null);
+          },
+          onAbort: function () {
+            cacheBar.endPrefetch('중단됨');
+          }
+        });
+      },
+
+      setProgress: function (pct, text) {
+        els.prefetchFill.style.width = Math.max(0, Math.min(100, pct)) + '%';
+        els.prefetchText.textContent = text || '';
+      },
+
+      endPrefetch: function (note) {
+        cacheManager.refresh().then(function () {
+          dashboard.refreshCacheBadges();
+          cacheBar.updateSummary();
+          if (note) {
+            els.storageInfo.textContent = note + ' · ' + els.storageInfo.textContent;
+          }
+        });
+      }
+    };
+
     function init() {
       state.videos = catalog.fromEmbedded(VIDEOS);
       dashboard.render();
       dashboard.bindControls();
       dashboard.bindFolderPicker();
+      cacheBar.bind();
       speed.bind();
       player.bind();
       pdfViewer.bind();
