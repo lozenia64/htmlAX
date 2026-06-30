@@ -1,0 +1,3290 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT채널 AX과제 시연 영상</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #FAFAFA;
+      --bg-gradient: linear-gradient(135deg, #FAFAFA 0%, #F5F3FF 40%, #FAFAFA 70%, #EEF2FF 100%);
+      --surface: #ffffff;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e4e4e7;
+      --accent: #4F46E5;
+      --accent-hover: #4338CA;
+      --accent-soft: #EEF2FF;
+      --accent-muted: #6366F1;
+      --radius: 14px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+      --shadow-hover: 0 16px 40px rgba(79, 70, 229, 0.1), 0 4px 12px rgba(15, 23, 42, 0.06);
+      --duration: 220ms;
+      --ease: cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans KR", "Noto Sans", sans-serif;
+      font-size: clamp(0.9375rem, 0.2vw + 0.9rem, 1rem);
+      line-height: 1.5;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(99, 102, 241, 0.07) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(79, 70, 229, 0.05) 0%, transparent 45%),
+        radial-gradient(circle, rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+      background-size: auto, auto, 24px 24px;
+      background-attachment: fixed;
+    }
+
+    button, input[type="range"] {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    .view {
+      display: none;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    .view.is-active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Dashboard */
+    .dashboard-hero {
+      width: 100%;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+
+    .dashboard-hero-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: clamp(2rem, 5vw, 3rem) clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .dashboard-title {
+      margin: 0;
+      font-size: clamp(1.75rem, 2.5vw + 1rem, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .dashboard-subtitle {
+      margin: 0.625rem 0 0;
+      font-size: clamp(0.9375rem, 0.5vw + 0.875rem, 1.0625rem);
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 36rem;
+    }
+
+    .stats-strip {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 1.25rem;
+      padding: 0.4375rem 0.875rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(79, 70, 229, 0.12);
+      border-radius: 999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: -0.01em;
+    }
+
+    .stats-strip[hidden] {
+      display: none;
+    }
+
+    .dashboard-main {
+      flex: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: clamp(1.75rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 2.5rem) clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 1.25rem;
+      padding: clamp(3rem, 8vw, 5rem) 1.5rem;
+      max-width: 24rem;
+      margin: 2rem auto;
+    }
+
+    .empty-state[hidden] {
+      display: none;
+    }
+
+    .empty-state-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--surface);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state h2 {
+      margin: 0;
+      font-size: clamp(1.125rem, 1.5vw + 0.9rem, 1.375rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: clamp(0.875rem, 0.5vw + 0.8rem, 0.9375rem);
+      line-height: 1.6;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background: var(--accent);
+      color: #fff;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      box-shadow: var(--shadow-sm);
+      transition: background var(--duration) var(--ease), transform var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+      gap: clamp(1.25rem, 2.5vw, 1.75rem);
+      width: 100%;
+    }
+
+    .card {
+      container-type: inline-size;
+      container-name: card;
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease), border-color var(--duration) var(--ease);
+      text-align: left;
+      padding: 0;
+      width: 100%;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-3px);
+      border-color: rgba(79, 70, 229, 0.2);
+    }
+
+    .card:hover .card-thumb img {
+      transform: scale(1.03);
+    }
+
+    .card:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .card-thumb {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(135deg, #e4e4e7 0%, #f4f4f5 100%);
+      overflow: hidden;
+    }
+
+    .card-thumb::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(15, 23, 42, 0.55) 0%, rgba(15, 23, 42, 0.1) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .card-badges {
+      position: absolute;
+      top: 0.75rem;
+      left: 0.75rem;
+      z-index: 2;
+      display: flex;
+      gap: 0.375rem;
+      pointer-events: none;
+    }
+
+    .card-badge {
+      padding: 0.25rem 0.625rem;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 999px;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(79, 70, 229, 0.15);
+    }
+
+    .card-badge.is-pdf {
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, 0.18);
+    }
+
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 400ms var(--ease);
+    }
+
+    .play-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.92);
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 4px 24px rgba(79, 70, 229, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity var(--duration) var(--ease), transform var(--duration) var(--ease);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .card:hover .play-overlay,
+    .card:focus-visible .play-overlay {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .thumb-skeleton {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+
+    .thumb-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .thumb-fallback[hidden],
+    .thumb-skeleton[hidden] {
+      display: none;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .card-body {
+      padding: 1rem 1.125rem 1.25rem;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: clamp(0.9375rem, 0.5vw + 0.85rem, 1.0625rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    @container card (min-width: 320px) {
+      .card-body {
+        padding: 1.125rem 1.25rem 1.25rem;
+      }
+      .card-title {
+        font-size: clamp(1rem, 0.5vw + 0.9rem, 1.125rem);
+      }
+    }
+
+    /* Catalog toolbar: 검색 + 카테고리 필터 + 정렬 */
+    .catalog-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .catalog-toolbar[hidden] {
+      display: none;
+    }
+
+    .search-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1 1 240px;
+      min-width: 200px;
+      max-width: 26rem;
+    }
+
+    .search-field svg.search-icon {
+      position: absolute;
+      left: 0.875rem;
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.625rem 2.25rem 0.625rem 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9375rem;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      border-radius: 50%;
+      color: var(--text-muted);
+      transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .search-clear[hidden] {
+      display: none;
+    }
+
+    .search-clear:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .search-clear:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .category-chips {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .category-chips[hidden] {
+      display: none;
+    }
+
+    .chip {
+      padding: 0.4rem 0.875rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      min-height: 2rem;
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .chip[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sort-field {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .sort-select {
+      padding: 0.5rem 2rem 0.5rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 2.25rem;
+    }
+
+    .sort-select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sort-field::after {
+      content: '';
+      position: absolute;
+      right: 0.875rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-right: 2px solid var(--text-muted);
+      border-bottom: 2px solid var(--text-muted);
+      transform: translateY(-25%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    /* 이어보기 셸프 */
+    .continue-section {
+      margin-bottom: clamp(2rem, 4vw, 2.75rem);
+    }
+
+    .continue-section[hidden] {
+      display: none;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.125rem, 1vw + 0.9rem, 1.375rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .text-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.375rem 0.625rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      min-height: auto;
+      min-width: auto;
+      transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .text-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .text-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .continue-row {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(min(80%, 280px), 1fr);
+      gap: clamp(1rem, 2vw, 1.5rem);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.5rem;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+    }
+
+    .continue-row .card {
+      scroll-snap-align: start;
+    }
+
+    #grid-heading {
+      margin: 0 0 1rem;
+    }
+
+    #grid-heading[hidden] {
+      display: none;
+    }
+
+    .no-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.75rem;
+      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .no-results[hidden] {
+      display: none;
+    }
+
+    .no-results svg {
+      width: 40px;
+      height: 40px;
+      opacity: 0.7;
+    }
+
+    .no-results p {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+
+    /* 카드 진행률 표시 */
+    .card-progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.35);
+      z-index: 2;
+    }
+
+    .card-progress[hidden] {
+      display: none;
+    }
+
+    .card-progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .card-status {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 2;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: rgba(15, 23, 42, 0.72);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .card-status[hidden] {
+      display: none;
+    }
+
+    .card-status.is-done {
+      background: rgba(22, 163, 74, 0.88);
+    }
+
+    /* 캐시 상태 핀(카드 좌하단) */
+    .card-cache {
+      position: absolute;
+      left: 0.75rem;
+      bottom: 0.75rem;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: rgba(15, 23, 42, 0.66);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .card-cache[hidden] {
+      display: none;
+    }
+
+    .card-cache.is-cached {
+      background: rgba(22, 163, 74, 0.9);
+    }
+
+    /* Player */
+    .player-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--accent);
+      font-weight: 500;
+      transition: background var(--duration) var(--ease);
+    }
+
+    .btn-back:hover {
+      background: var(--accent-soft);
+    }
+
+    .btn-back:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .player-title {
+      margin: 0;
+      font-size: clamp(1rem, 1vw + 0.9rem, 1.125rem);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1rem;
+      gap: 1rem;
+      overflow-y: auto;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 20% 10%, rgba(99, 102, 241, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(79, 70, 229, 0.04) 0%, transparent 45%);
+    }
+
+    /* 영상 + 컨트롤(좌)과 PDF(우)를 담는 무대. 기본은 세로 스택(현행 유지) */
+    .player-stage {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-primary {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    /* 데스크톱: PDF 카드는 항상 영상 우측. 접힘=작은 카드, 펼침=읽기 컬럼 */
+    @media (min-width: 1024px) {
+      .player-main.has-pdf .player-stage {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        max-width: 1560px;
+        margin-inline: auto;
+      }
+      .player-main.has-pdf .player-primary {
+        flex: 1 1 auto;
+        max-width: 960px;
+        min-width: 0;
+      }
+      /* 접힘: 영상 우측 '중앙'에 떠 있는 원형 문서 버튼
+         (#pdf-section 높이를 영상 높이에 맞춰 JS로 동기화 → FAB가 영상 세로 중앙에 정렬) */
+      .player-main.has-pdf:not(.is-pdf-open) #pdf-section {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header {
+        width: 56px;
+        min-width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        color: var(--accent);
+        transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header:hover {
+        background: var(--accent-soft);
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-1px);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-title,
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-chevron {
+        display: none;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-icon {
+        display: inline-flex;
+      }
+      /* 펼침: 읽기 컬럼으로 확장, 영상 높이에 맞춰 늘어남 */
+      .player-main.is-pdf-open #pdf-section {
+        flex: 0 0 auto;
+        width: clamp(360px, 38%, 680px);
+        max-width: 680px;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+      }
+      .player-main.is-pdf-open .pdf-card-body {
+        flex: 1;
+        min-height: 0;
+      }
+      .player-main.is-pdf-open .pdf-slide-view {
+        height: auto;
+        flex: 1;
+        min-height: 320px;
+      }
+    }
+
+    .video-wrap {
+      width: 100%;
+      max-width: 960px;
+      flex-shrink: 0;
+      margin-inline: auto;
+      position: relative;
+      aspect-ratio: var(--media-aspect, 16 / 9);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    /* 원본 해상도 width ≥ 960px 인 영상은 항상 960px 너비로 표시 */
+    .video-wrap.is-hd-wide {
+      width: min(960px, 100%);
+      max-width: 960px;
+      max-height: none;
+    }
+
+    .player-poster,
+    .video-wrap video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: fill;
+      object-position: center;
+    }
+
+    .player-poster {
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .player-poster[hidden] {
+      display: none;
+    }
+
+    .video-wrap video {
+      z-index: 1;
+    }
+
+    .video-wrap.is-idle video {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .player-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      font-size: 0.9375rem;
+      z-index: 3;
+    }
+
+    .player-loading[hidden] {
+      display: none;
+    }
+
+    .controls-dock {
+      width: 100%;
+      max-width: 960px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      padding: 0.5rem 0.75rem 0.625rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.375rem;
+      max-height: calc((0.875rem * 2 + 1.375rem) * 2);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .controls-progress {
+      flex-shrink: 0;
+      padding: 0.125rem 0;
+    }
+
+    /* 시크바 위 챕터 마커 (시각 표시 전용, 입력 방해 없음) */
+    .seek-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .chapter-markers {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .chapter-marker {
+      position: absolute;
+      top: 0;
+      transform: translate(-50%, -50%);
+      width: 3px;
+      height: 11px;
+      border-radius: 2px;
+      background: var(--accent-muted);
+      box-shadow: 0 0 0 1.5px var(--surface);
+      opacity: 0.55;
+      transition: opacity var(--duration) var(--ease), height var(--duration) var(--ease), background var(--duration) var(--ease);
+    }
+
+    .chapter-marker.is-active {
+      opacity: 1;
+      height: 14px;
+      background: var(--accent);
+    }
+
+    .controls-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 2rem;
+      max-height: 2.25rem;
+      flex-shrink: 0;
+    }
+
+    .btn-play {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      flex-shrink: 0;
+      transition: background var(--duration) var(--ease);
+    }
+
+    .btn-play svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .btn-play:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-play:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .seek-bar {
+      width: 100%;
+      height: 4px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border);
+      border-radius: 2px;
+      cursor: pointer;
+      display: block;
+    }
+
+    .seek-bar:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    .seek-bar::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      margin-top: 0;
+    }
+
+    .seek-bar::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: none;
+      cursor: pointer;
+    }
+
+    .time-display {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      flex-shrink: 0;
+      min-width: 4.5rem;
+    }
+
+    .chapters-toolbar {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .chapters-toolbar[hidden] {
+      display: none;
+    }
+
+    .speed-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .btn-speed {
+      padding: 0.2rem 0.45rem;
+      min-width: 2rem;
+      min-height: 1.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-weight: 600;
+      font-size: 0.6875rem;
+      line-height: 1;
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .btn-speed:hover {
+      border-color: var(--accent);
+    }
+
+    .btn-speed[aria-pressed="true"] {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-speed:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .pdf-panel {
+      width: 100%;
+      max-width: 960px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .pdf-panel[hidden] {
+      display: none;
+    }
+
+    .pdf-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 0;
+      background: var(--surface);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: background var(--duration) var(--ease);
+    }
+
+    .pdf-card-header:hover {
+      background: var(--surface-hover);
+    }
+
+    .pdf-card-header:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+    }
+
+    .pdf-card-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pdf-card-icon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .pdf-card-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .pdf-card-chevron {
+      display: inline-flex;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: var(--text-muted);
+      transition: transform var(--duration) var(--ease);
+      line-height: 1;
+    }
+
+    .pdf-card-chevron svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .pdf-card-header[aria-expanded="true"] .pdf-card-chevron {
+      transform: rotate(180deg);
+    }
+
+    .pdf-card-body {
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pdf-card-body[hidden] {
+      display: none;
+    }
+
+    .pdf-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 0.625rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .pdf-toolbar h3 {
+      display: none;
+    }
+
+    .pdf-nav {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-pdf-nav {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 1.25rem;
+      line-height: 1;
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease);
+    }
+
+    .btn-pdf-nav:hover:not(:disabled) {
+      background: var(--surface-hover);
+      border-color: var(--border-strong);
+    }
+
+    .btn-pdf-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .btn-pdf-nav:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .pdf-page-info {
+      min-width: 4.5rem;
+      text-align: center;
+      font-size: 0.875rem;
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+    }
+
+    .pdf-slide-view {
+      position: relative;
+      height: min(42vh, 520px);
+      background: #525659;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: auto;
+    }
+
+    .pdf-slide-view canvas {
+      display: block;
+      max-width: 100%;
+      max-height: 100%;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .pdf-loading {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(82, 86, 89, 0.85);
+      color: #fff;
+      font-size: 0.9375rem;
+    }
+
+    .pdf-loading[hidden] {
+      display: none;
+    }
+
+    .chapters-scroll {
+      display: flex;
+      gap: 0.375rem;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      height: 100%;
+      align-items: center;
+    }
+
+    .chapters-scroll::-webkit-scrollbar {
+      display: none;
+    }
+
+    .btn-chapter {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      line-height: 1.2;
+      white-space: nowrap;
+      min-height: 1.75rem;
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .btn-chapter:hover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .btn-chapter.is-active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .btn-chapter:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .chapter-time {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-muted);
+      font-size: 0.625rem;
+      font-weight: 600;
+    }
+
+    .btn-chapter.is-active .chapter-time {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    #folder-input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    @media (max-width: 1023px) {
+      body::before {
+        content: '이 대시보드는 PC(화면 너비 1024px 이상)에서 이용해 주세요.';
+        display: block;
+        padding: 0.75rem 1rem;
+        background: #fef3c7;
+        color: #92400e;
+        text-align: center;
+        font-size: 0.875rem;
+        border-bottom: 1px solid #fcd34d;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .card:hover {
+        transform: none;
+      }
+      .card:hover .card-thumb img {
+        transform: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="view-dashboard" class="view is-active" role="region" aria-label="대시보드">
+    <header class="dashboard-hero">
+      <div class="dashboard-hero-inner">
+        <h1 class="dashboard-title">IT채널 AX과제 시연 영상</h1>
+        <p class="dashboard-subtitle">시연 영상을 선택하여 시청하세요</p>
+        <div id="stats-strip" class="stats-strip" hidden>
+          <span id="stats-count"></span>
+        </div>
+      </div>
+    </header>
+    <main class="dashboard-main">
+      <div id="empty-state" class="empty-state" hidden>
+        <div class="empty-state-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <h2>재생할 동영상이 없습니다</h2>
+        <p>아래 버튼으로 동영상이 있는 폴더를 선택해 주세요.</p>
+        <button type="button" id="btn-pick-folder" class="btn-primary">폴더 선택</button>
+      </div>
+
+      <div id="catalog-toolbar" class="catalog-toolbar" hidden>
+        <div class="search-field">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="search-input" class="search-input" placeholder="시연 영상 검색…" aria-label="시연 영상 검색" autocomplete="off">
+          <button type="button" id="search-clear" class="search-clear" aria-label="검색어 지우기" hidden>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div id="category-chips" class="category-chips" role="group" aria-label="카테고리 필터" hidden></div>
+        <label class="sort-field">
+          <span class="sr-only">정렬 기준</span>
+          <select id="sort-select" class="sort-select">
+            <option value="default">기본순</option>
+            <option value="title">제목순</option>
+            <option value="recent">최근 시청순</option>
+          </select>
+        </label>
+      </div>
+
+      <section id="continue-section" class="continue-section" aria-label="이어보기" hidden>
+        <div class="section-head">
+          <h2 class="section-title">이어보기</h2>
+          <button type="button" id="continue-clear" class="text-btn">시청 기록 지우기</button>
+        </div>
+        <div id="continue-row" class="continue-row" role="list"></div>
+      </section>
+
+      <h2 id="grid-heading" class="section-title" hidden>전체 시연 영상</h2>
+      <div id="card-grid" class="card-grid" role="list"></div>
+      <div id="no-results" class="no-results" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p>검색 결과가 없습니다. 다른 검색어나 카테고리를 선택해 보세요.</p>
+      </div>
+    </main>
+  </div>
+
+  <div id="view-player" class="view" role="region" aria-label="플레이어">
+    <header class="player-header">
+      <button type="button" id="btn-back" class="btn-back" aria-label="목록으로 돌아가기">← 목록으로</button>
+      <h2 id="player-title" class="player-title"></h2>
+    </header>
+    <main class="player-main">
+      <div class="player-stage">
+        <div class="player-primary">
+      <div class="video-wrap" id="video-wrap">
+        <img id="player-poster" class="player-poster" alt="" hidden>
+        <video id="player-video" playsinline preload="none"></video>
+        <div id="player-loading" class="player-loading" hidden>불러오는 중…</div>
+      </div>
+      <div class="controls-dock">
+        <div class="controls-progress">
+          <div class="seek-wrap">
+            <input type="range" id="seek-bar" class="seek-bar" min="0" max="100" value="0" step="0.01" aria-label="재생 위치">
+            <div id="chapter-markers" class="chapter-markers" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="controls-toolbar">
+          <button type="button" id="btn-play" class="btn-play" aria-label="재생">
+            <svg id="icon-play" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            <svg id="icon-pause" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" hidden>
+              <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+            </svg>
+          </button>
+          <span id="time-display" class="time-display">0:00 / 0:00</span>
+          <div id="chapters-section" class="chapters-toolbar" hidden>
+            <div id="chapters-list" class="chapters-scroll" role="group" aria-label="챕터 타임라인"></div>
+          </div>
+          <div class="speed-toolbar" role="group" aria-label="재생 속도">
+            <button type="button" class="btn-speed" data-speed="1" aria-pressed="true">1×</button>
+            <button type="button" class="btn-speed" data-speed="2" aria-pressed="false">2×</button>
+            <button type="button" class="btn-speed" data-speed="3" aria-pressed="false">3×</button>
+          </div>
+        </div>
+      </div>
+        </div>
+
+      <section id="pdf-section" class="pdf-panel" hidden aria-label="과제 설명 PDF">
+        <button type="button" id="pdf-card-toggle" class="pdf-card-header" aria-expanded="false" aria-controls="pdf-card-body" aria-label="과제 설명 PDF">
+          <span class="pdf-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </span>
+          <span class="pdf-card-title">과제 설명 (PDF)</span>
+          <span class="pdf-card-chevron" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 6 15 12 9 18"/>
+            </svg>
+          </span>
+        </button>
+        <div id="pdf-card-body" class="pdf-card-body" hidden>
+          <div class="pdf-toolbar">
+            <div class="pdf-nav" role="group" aria-label="PDF 슬라이드">
+              <button type="button" id="pdf-prev" class="btn-pdf-nav" aria-label="이전 슬라이드">‹</button>
+              <span id="pdf-page-info" class="pdf-page-info">1 / —</span>
+              <button type="button" id="pdf-next" class="btn-pdf-nav" aria-label="다음 슬라이드">›</button>
+            </div>
+          </div>
+          <div class="pdf-slide-view" id="pdf-slide-view">
+            <canvas id="pdf-canvas" aria-label="과제 설명 PDF 슬라이드"></canvas>
+            <div id="pdf-loading" class="pdf-loading" hidden>불러오는 중…</div>
+          </div>
+        </div>
+      </section>
+      </div>
+    </main>
+  </div>
+
+  <input type="file" id="folder-input" webkitdirectory multiple>
+
+  <script src="vendor/pdfjs/pdf.min.js"></script>
+  <script>
+  // __VIDEOS_JSON__
+const VIDEOS = [{"file":"mp4/mcp-e2e-platform.mp4","title":"MCP기반지능형웹E2E자동화플랫폼","pdf":"pdf/mcp-e2e-platform.pdf","pdfPages":6}];
+// __VIDEOS_JSON__
+  // __CHAPTERS_JSON__
+const CHAPTERS = {"mp4/mcp-e2e-platform.mp4":[{"time":10,"label":"로그인"},{"time":12,"label":"사용자화면"},{"time":37,"label":"단일시스템점검(모바일홈페이지)"},{"time":330,"label":"전체시스템점검(PC홈페이지/챗봇)"}]};
+// __CHAPTERS_JSON__
+  // __THUMBNAILS_JSON__
+const THUMBNAILS = {"mp4/mcp-e2e-platform.mp4":"thumbs/mcp-e2e-platform.jpg"};
+// __THUMBNAILS_JSON__
+  // __POSTERS_JSON__
+const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
+// __POSTERS_JSON__
+
+  (function () {
+    'use strict';
+
+    if (typeof pdfjsLib !== 'undefined') {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdfjs/pdf.worker.min.js';
+    }
+
+    var VIDEO_EXTS = /\.(mp4|webm|ogg|mov)$/i;
+
+    var state = {
+      videos: [],
+      currentIndex: -1,
+      speed: 1,
+      seeking: false,
+      metadataReady: false,
+      pendingSrc: null,
+      pendingSeekTime: null,
+      isBuffering: false,
+      bufferCallbacks: [],
+      videoSourceAttached: null,
+      videoReady: false,
+      loadingDefaultText: '불러오는 중…',
+      hasInternalHistory: false
+    };
+
+    /** 세션 내 Blob URL (목록 복귀 시 재사용, 새로고침 전까지) */
+    var sessionBlobUrls = {};
+
+    /** IndexedDB — 다운로드한 영상 영구 캐시 (새로고침 후에도 유지) */
+    var videoStore = {
+      dbName: 'mov-demo-videos',
+      storeName: 'videos',
+      version: 2,
+
+      openDb: function () {
+        return new Promise(function (resolve, reject) {
+          if (!window.indexedDB) {
+            reject(new Error('IndexedDB unavailable'));
+            return;
+          }
+          var req = indexedDB.open(videoStore.dbName, videoStore.version);
+          req.onupgradeneeded = function (e) {
+            var db = e.target.result;
+            if (db.objectStoreNames.contains(videoStore.storeName)) {
+              db.deleteObjectStore(videoStore.storeName);
+            }
+            db.createObjectStore(videoStore.storeName);
+          };
+          req.onsuccess = function () { resolve(req.result); };
+          req.onerror = function () { reject(req.error); };
+        });
+      },
+
+      get: function (key) {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(videoStore.storeName, 'readonly');
+            var req = tx.objectStore(videoStore.storeName).get(key);
+            req.onsuccess = function () {
+              var record = req.result;
+              if (!record) {
+                resolve(null);
+                return;
+              }
+              var blob = record instanceof Blob ? record : record.blob;
+              var expectedSize = record instanceof Blob ? 0 : (record.size || 0);
+              if (!blob || !(blob instanceof Blob)) {
+                resolve(null);
+                return;
+              }
+              if (expectedSize > 0 && blob.size !== expectedSize) {
+                videoStore.remove(key).then(function () { resolve(null); });
+                return;
+              }
+              resolve({ blob: blob, size: blob.size });
+            };
+            req.onerror = function () { resolve(null); };
+          });
+        }).catch(function () {
+          return null;
+        });
+      },
+
+      put: function (key, blob, expectedSize) {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(videoStore.storeName, 'readwrite');
+            tx.objectStore(videoStore.storeName).put({
+              blob: blob,
+              size: expectedSize || blob.size,
+              v: 1
+            }, key);
+            tx.oncomplete = function () { resolve(); };
+            tx.onerror = function () { reject(tx.error); };
+          });
+        });
+      },
+
+      remove: function (key) {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve, reject) {
+            var tx = db.transaction(videoStore.storeName, 'readwrite');
+            tx.objectStore(videoStore.storeName).delete(key);
+            tx.oncomplete = function () { resolve(); };
+            tx.onerror = function () { reject(tx.error); };
+          });
+        });
+      },
+
+      /** 저장된 모든 키 목록 (blob 본체는 읽지 않음 → 가벼움) */
+      keys: function () {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve) {
+            var tx = db.transaction(videoStore.storeName, 'readonly');
+            var req = tx.objectStore(videoStore.storeName).getAllKeys();
+            req.onsuccess = function () { resolve(req.result || []); };
+            req.onerror = function () { resolve([]); };
+          });
+        }).catch(function () {
+          return [];
+        });
+      }
+    };
+
+    var els = {
+      viewDashboard: document.getElementById('view-dashboard'),
+      viewPlayer: document.getElementById('view-player'),
+      emptyState: document.getElementById('empty-state'),
+      cardGrid: document.getElementById('card-grid'),
+      statsStrip: document.getElementById('stats-strip'),
+      statsCount: document.getElementById('stats-count'),
+      btnPickFolder: document.getElementById('btn-pick-folder'),
+      folderInput: document.getElementById('folder-input'),
+      catalogToolbar: document.getElementById('catalog-toolbar'),
+      searchInput: document.getElementById('search-input'),
+      searchClear: document.getElementById('search-clear'),
+      categoryChips: document.getElementById('category-chips'),
+      sortSelect: document.getElementById('sort-select'),
+      continueSection: document.getElementById('continue-section'),
+      continueRow: document.getElementById('continue-row'),
+      continueClear: document.getElementById('continue-clear'),
+      gridHeading: document.getElementById('grid-heading'),
+      noResults: document.getElementById('no-results'),
+      btnBack: document.getElementById('btn-back'),
+      playerTitle: document.getElementById('player-title'),
+      videoWrap: document.getElementById('video-wrap'),
+      playerPoster: document.getElementById('player-poster'),
+      playerVideo: document.getElementById('player-video'),
+      playerLoading: document.getElementById('player-loading'),
+      btnPlay: document.getElementById('btn-play'),
+      iconPlay: document.getElementById('icon-play'),
+      iconPause: document.getElementById('icon-pause'),
+      seekBar: document.getElementById('seek-bar'),
+      timeDisplay: document.getElementById('time-display'),
+      speedButtons: document.querySelectorAll('.btn-speed'),
+      chaptersSection: document.getElementById('chapters-section'),
+      chaptersList: document.getElementById('chapters-list'),
+      chapterMarkers: document.getElementById('chapter-markers'),
+      playerMain: document.querySelector('.player-main'),
+      pdfSection: document.getElementById('pdf-section'),
+      pdfCardToggle: document.getElementById('pdf-card-toggle'),
+      pdfCardBody: document.getElementById('pdf-card-body'),
+      pdfSlideView: document.getElementById('pdf-slide-view'),
+      pdfCanvas: document.getElementById('pdf-canvas'),
+      pdfLoading: document.getElementById('pdf-loading'),
+      pdfPrev: document.getElementById('pdf-prev'),
+      pdfNext: document.getElementById('pdf-next'),
+      pdfPageInfo: document.getElementById('pdf-page-info')
+    };
+
+    function stripExtension(name) {
+      return name.replace(/\.[^.]+$/, '');
+    }
+
+    /** 영상 식별용 슬러그 (파일명 기준, 경로/확장자 제거) — 딥링크 #video= 값 */
+    function slugify(name) {
+      var base = String(name || '').split('/').pop();
+      return stripExtension(base);
+    }
+
+    function formatTime(seconds) {
+      if (!isFinite(seconds) || seconds < 0) return '0:00';
+      var m = Math.floor(seconds / 60);
+      var s = Math.floor(seconds % 60);
+      return m + ':' + String(s).padStart(2, '0');
+    }
+
+    var catalog = {
+      fromEmbedded: function (entries) {
+        return entries.map(function (entry) {
+          if (typeof entry === 'string') {
+            return {
+              name: entry,
+              title: stripExtension(entry),
+              src: entry,
+              slug: slugify(entry),
+              source: 'embedded'
+            };
+          }
+          return {
+            name: entry.file,
+            title: entry.title,
+            src: entry.file,
+            slug: slugify(entry.file),
+            pdf: entry.pdf || null,
+            pdfPages: entry.pdfPages || null,
+            category: entry.category || null,
+            tags: Array.isArray(entry.tags) ? entry.tags : [],
+            source: 'embedded'
+          };
+        });
+      },
+
+      fromPickerFiles: function (files) {
+        var items = [];
+        for (var i = 0; i < files.length; i++) {
+          var file = files[i];
+          if (!VIDEO_EXTS.test(file.name)) continue;
+          var parts = (file.webkitRelativePath || file.name).split('/');
+          if (parts.length > 2) continue;
+          items.push({
+            name: file.name,
+            title: stripExtension(file.name),
+            src: URL.createObjectURL(file),
+            category: null,
+            tags: [],
+            source: 'picker'
+          });
+        }
+        items.sort(function (a, b) {
+          return a.name.localeCompare(b.name, 'ko');
+        });
+        return items;
+      }
+    };
+
+    var router = {
+      showDashboard: function () {
+        els.viewDashboard.classList.add('is-active');
+        els.viewPlayer.classList.remove('is-active');
+        player.pause();
+        player.cleanup();
+        state.pendingSrc = null;
+        state.pendingSeekTime = null;
+        state.metadataReady = false;
+        els.playerLoading.hidden = true;
+        pdfViewer.close();
+        // 시청 진행률(이어보기/진행바)을 최신 상태로 다시 그림
+        dashboard.render();
+      },
+
+      showPlayer: function (index) {
+        state.currentIndex = index;
+        var video = state.videos[index];
+        if (!video) return;
+        progress.lastSavedT = -1;
+
+        els.viewDashboard.classList.remove('is-active');
+        els.viewPlayer.classList.add('is-active');
+        els.playerTitle.textContent = video.title;
+
+        player.cleanup();
+        player.reset();
+        chapters.render(video.name);
+        state.metadataReady = false;
+        state.pendingSeekTime = null;
+        state.pendingSrc = video.src;
+        player.showPoster(video);
+        els.playerLoading.hidden = true;
+        pdfViewer.setup(video.pdf);
+      }
+    };
+
+    /**
+     * 해시 기반 딥링크 라우팅.
+     * 형식: #video=<slug>&t=<초>&pdf
+     *  - 카드 클릭 → location.hash 갱신(히스토리 push) → hashchange → apply()
+     *  - 재생 위치/ PDF 펼침 상태는 replaceState 로 URL 에 반영(히스토리 미증가, 북마크 재개용)
+     */
+    var routing = {
+      lastWrittenTime: -1,
+
+      parse: function () {
+        var raw = location.hash.replace(/^#/, '');
+        if (!raw) return null;
+        var params = {};
+        raw.split('&').forEach(function (pair) {
+          if (!pair) return;
+          var eq = pair.indexOf('=');
+          var key = decodeURIComponent(eq === -1 ? pair : pair.slice(0, eq));
+          var val = eq === -1 ? '' : decodeURIComponent(pair.slice(eq + 1));
+          if (key) params[key] = val;
+        });
+        return params;
+      },
+
+      findIndexBySlug: function (slug) {
+        for (var i = 0; i < state.videos.length; i++) {
+          if (state.videos[i].slug === slug) return i;
+        }
+        return -1;
+      },
+
+      /** 현재 해시를 읽어 해당 뷰로 동기화 (초기 로드 + hashchange) */
+      apply: function () {
+        this.lastWrittenTime = -1;
+        var params = this.parse();
+        if (!params || !params.video) {
+          router.showDashboard();
+          return;
+        }
+        var index = this.findIndexBySlug(params.video);
+        if (index < 0) {
+          router.showDashboard();
+          return;
+        }
+        router.showPlayer(index);
+        var video = state.videos[index];
+        if ('pdf' in params && video.pdf) {
+          pdfViewer.expand();
+        }
+        var t = parseFloat(params.t);
+        if (isFinite(t) && t > 0) {
+          player.seekToTime(t, false);
+        }
+      },
+
+      /** 영상 진입(히스토리 push). slug 없는 로컬(picker) 영상은 직접 표시 */
+      goToVideo: function (index) {
+        var video = state.videos[index];
+        if (video && video.slug) {
+          state.hasInternalHistory = true;
+          var hash = 'video=' + encodeURIComponent(video.slug);
+          // 이어보기: 저장된 위치가 있으면 그 지점부터 재생
+          var resume = progress.ratio(video.slug) !== null ? progress.get(video.slug) : null;
+          if (resume && resume.t >= progress.MIN_RESUME) {
+            hash += '&t=' + resume.t;
+          }
+          location.hash = hash;
+        } else {
+          router.showPlayer(index);
+        }
+      },
+
+      /** 목록 복귀: 내부 히스토리가 있으면 뒤로가기, 아니면 해시 비우기 */
+      goToDashboard: function () {
+        if (location.hash) {
+          if (state.hasInternalHistory) {
+            history.back();
+          } else {
+            location.hash = '';
+          }
+        } else {
+          router.showDashboard();
+        }
+      },
+
+      /** 현재 플레이어 상태(영상/시간/PDF)를 URL 에 반영 — 히스토리 증가 없음 */
+      writeState: function () {
+        if (state.currentIndex < 0) return;
+        var video = state.videos[state.currentIndex];
+        if (!video || !video.slug) return;
+        if (!els.viewPlayer.classList.contains('is-active')) return;
+        var parts = 'video=' + encodeURIComponent(video.slug);
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t > 0) parts += '&t=' + t;
+        if (pdfViewer.expanded) parts += '&pdf';
+        try {
+          history.replaceState(null, '', '#' + parts);
+        } catch (e) { /* ignore */ }
+      },
+
+      /** 재생 중 정수 초가 바뀔 때만 URL 시간 갱신 (북마크 재개) */
+      syncTime: function () {
+        if (state.currentIndex < 0) return;
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t === this.lastWrittenTime) return;
+        this.lastWrittenTime = t;
+        this.writeState();
+      },
+
+      bind: function () {
+        var self = this;
+        window.addEventListener('hashchange', function () {
+          self.apply();
+        });
+      }
+    };
+
+    var pdfViewer = {
+      doc: null,
+      pendingPath: null,
+      path: null,
+      page: 1,
+      totalPages: null,
+      renderTask: null,
+      expanded: false,
+
+      setup: function (path) {
+        if (!path) {
+          this.close();
+          return;
+        }
+        this.closeDoc();
+        this.pendingPath = path;
+        this.path = null;
+        this.page = 1;
+        this.totalPages = null;
+        this.expanded = false;
+        els.pdfSection.hidden = false;
+        els.pdfCardBody.hidden = true;
+        els.pdfCardToggle.setAttribute('aria-expanded', 'false');
+        els.playerMain.classList.add('has-pdf');
+        els.pdfPageInfo.textContent = '1 / —';
+        player.syncFabPosition();
+      },
+
+      toggleExpand: function () {
+        if (this.expanded) {
+          this.collapse();
+        } else {
+          this.expand();
+        }
+      },
+
+      expand: function () {
+        this.expanded = true;
+        els.pdfCardBody.hidden = false;
+        els.pdfCardToggle.setAttribute('aria-expanded', 'true');
+        els.playerMain.classList.add('is-pdf-open');
+        player.syncFabPosition();
+        if (!this.doc && this.pendingPath) {
+          this.loadDocument(this.pendingPath);
+        } else if (this.doc) {
+          // 좌우 분할로 컨테이너 크기가 바뀌므로 레이아웃 반영 후 재렌더
+          var self = this;
+          requestAnimationFrame(function () { self.renderPage(); });
+        }
+        routing.writeState();
+      },
+
+      collapse: function () {
+        this.expanded = false;
+        els.pdfCardBody.hidden = true;
+        els.pdfCardToggle.setAttribute('aria-expanded', 'false');
+        els.playerMain.classList.remove('is-pdf-open');
+        player.syncFabPosition();
+        routing.writeState();
+      },
+
+      loadDocument: function (path) {
+        if (typeof pdfjsLib === 'undefined') {
+          els.pdfPageInfo.textContent = 'PDF 뷰어 로드 실패';
+          return;
+        }
+        this.path = path;
+        this.page = 1;
+        els.pdfLoading.hidden = false;
+        var self = this;
+        pdfjsLib.getDocument(this.path).promise.then(function (doc) {
+          self.doc = doc;
+          self.totalPages = doc.numPages;
+          return self.renderPage();
+        }).catch(function () {
+          self.totalPages = null;
+          els.pdfPageInfo.textContent = 'PDF 로드 실패';
+        }).finally(function () {
+          els.pdfLoading.hidden = true;
+        });
+      },
+
+      open: function (path) {
+        this.setup(path);
+        this.expand();
+      },
+
+      closeDoc: function () {
+        if (this.renderTask) {
+          try {
+            this.renderTask.cancel();
+          } catch (e) { /* ignore */ }
+          this.renderTask = null;
+        }
+        if (this.doc) {
+          this.doc.destroy();
+          this.doc = null;
+        }
+      },
+
+      close: function () {
+        this.closeDoc();
+        this.collapse();
+        els.pdfSection.hidden = true;
+        els.playerMain.classList.remove('has-pdf');
+        this.pendingPath = null;
+        this.path = null;
+        this.page = 1;
+        this.totalPages = null;
+        this.expanded = false;
+        var canvas = els.pdfCanvas;
+        var ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.width = 0;
+        canvas.height = 0;
+      },
+
+      renderPage: function () {
+        var self = this;
+        if (!this.doc) return Promise.resolve();
+        return this.doc.getPage(this.page).then(function (page) {
+          if (self.renderTask) {
+            try {
+              self.renderTask.cancel();
+            } catch (e) { /* ignore */ }
+          }
+          var container = els.pdfSlideView;
+          var canvas = els.pdfCanvas;
+          var ctx = canvas.getContext('2d');
+          var baseViewport = page.getViewport({ scale: 1 });
+          var containerWidth = container.clientWidth || 800;
+          var containerHeight = container.clientHeight || 400;
+          var scale = Math.min(
+            containerWidth / baseViewport.width,
+            containerHeight / baseViewport.height
+          );
+          var viewport = page.getViewport({ scale: scale });
+          var dpr = window.devicePixelRatio || 1;
+          canvas.width = Math.floor(viewport.width * dpr);
+          canvas.height = Math.floor(viewport.height * dpr);
+          canvas.style.width = Math.floor(viewport.width) + 'px';
+          canvas.style.height = Math.floor(viewport.height) + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, viewport.width, viewport.height);
+          self.renderTask = page.render({
+            canvasContext: ctx,
+            viewport: viewport
+          });
+          return self.renderTask.promise;
+        }).then(function () {
+          self.updateNav();
+        }).catch(function (err) {
+          if (err && err.name === 'RenderingCancelledException') return;
+        });
+      },
+
+      updateNav: function () {
+        var label = String(this.page);
+        if (this.totalPages) {
+          label += ' / ' + this.totalPages;
+        }
+        els.pdfPageInfo.textContent = label;
+        els.pdfPrev.disabled = this.page <= 1;
+        els.pdfNext.disabled = this.totalPages ? this.page >= this.totalPages : false;
+      },
+
+      prev: function () {
+        if (this.page <= 1) return;
+        this.page--;
+        els.pdfLoading.hidden = false;
+        var self = this;
+        this.renderPage().finally(function () {
+          els.pdfLoading.hidden = true;
+        });
+      },
+
+      next: function () {
+        if (this.totalPages && this.page >= this.totalPages) return;
+        this.page++;
+        els.pdfLoading.hidden = false;
+        var self = this;
+        this.renderPage().finally(function () {
+          els.pdfLoading.hidden = true;
+        });
+      },
+
+      bind: function () {
+        var self = this;
+        els.pdfCardToggle.addEventListener('click', function () {
+          self.toggleExpand();
+        });
+        els.pdfPrev.addEventListener('click', function (e) {
+          e.stopPropagation();
+          self.prev();
+        });
+        els.pdfNext.addEventListener('click', function (e) {
+          e.stopPropagation();
+          self.next();
+        });
+        window.addEventListener('resize', function () {
+          player.syncFabPosition();
+          if (els.pdfSection.hidden || !self.doc || !self.expanded) return;
+          self.renderPage();
+        });
+      }
+    };
+
+    /**
+     * 시청 진행률 — localStorage 영구 저장 (오프라인/내부망 동작).
+     * 키: slug(임베디드 영상만). picker(blob) 영상은 세션 한정이라 저장 안 함.
+     * 값: { t: 초, d: 총길이, at: 타임스탬프 }
+     */
+    var progress = {
+      storeKey: 'mov-demo-progress',
+      cache: null,
+      lastSavedT: -1,
+      /** 시청 완료로 간주하는 비율(이 이상이면 이어보기에서 제외) */
+      DONE_RATIO: 0.97,
+      /** 이어보기로 기록을 남기기 시작하는 최소 재생 초 */
+      MIN_RESUME: 5,
+
+      loadAll: function () {
+        if (this.cache) return this.cache;
+        try {
+          this.cache = JSON.parse(localStorage.getItem(this.storeKey) || '{}') || {};
+        } catch (e) {
+          this.cache = {};
+        }
+        return this.cache;
+      },
+
+      persist: function () {
+        try {
+          localStorage.setItem(this.storeKey, JSON.stringify(this.cache || {}));
+        } catch (e) { /* 용량 초과 등은 무시 */ }
+      },
+
+      get: function (slug) {
+        if (!slug) return null;
+        return this.loadAll()[slug] || null;
+      },
+
+      set: function (slug, t, d) {
+        if (!slug) return;
+        var all = this.loadAll();
+        all[slug] = { t: Math.floor(t), d: Math.floor(d) || 0, at: Date.now() };
+        this.cache = all;
+        this.persist();
+      },
+
+      remove: function (slug) {
+        if (!slug) return;
+        var all = this.loadAll();
+        if (all[slug]) {
+          delete all[slug];
+          this.persist();
+        }
+      },
+
+      clearAll: function () {
+        this.cache = {};
+        this.persist();
+      },
+
+      /** 0~1 진행 비율. 완료(거의 끝)면 null 반환 → 이어보기 미노출 */
+      ratio: function (slug) {
+        var p = this.get(slug);
+        if (!p || !p.d) return null;
+        var r = Math.max(0, Math.min(1, p.t / p.d));
+        return r >= this.DONE_RATIO ? null : r;
+      },
+
+      isDone: function (slug) {
+        var p = this.get(slug);
+        if (!p || !p.d) return false;
+        return (p.t / p.d) >= this.DONE_RATIO;
+      },
+
+      /** timeupdate 시 호출 — 정수 초가 바뀔 때만 저장 */
+      saveCurrent: function () {
+        if (state.currentIndex < 0) return;
+        var video = state.videos[state.currentIndex];
+        if (!video || !video.slug) return;
+        var v = els.playerVideo;
+        var t = Math.floor(v.currentTime || 0);
+        if (t === this.lastSavedT) return;
+        this.lastSavedT = t;
+        var d = v.duration || 0;
+        if (!isFinite(d) || d <= 0) return;
+        if ((t / d) >= this.DONE_RATIO || t >= d - 1) {
+          // 거의 다 봄 → 완료로 기록(이어보기 제외, 카드엔 '시청 완료')
+          this.set(video.slug, d, d);
+        } else if (t >= this.MIN_RESUME) {
+          this.set(video.slug, t, d);
+        }
+      }
+    };
+
+    var dashboard = {
+      /** 현재 대시보드 필터 상태 */
+      filter: { query: '', category: 'all', sort: 'default' },
+
+      thumbFor: function (video) {
+        if (video.source !== 'embedded' || typeof THUMBNAILS === 'undefined') return '';
+        return THUMBNAILS[video.name] || '';
+      },
+
+      thumbHtmlFor: function (video) {
+        var icon =
+          '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+            '<rect x="2" y="4" width="20" height="16" rx="2"/>' +
+            '<path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>' +
+          '</svg>';
+        var thumbSrc = this.thumbFor(video);
+        if (thumbSrc) {
+          return '<img loading="lazy" alt="" src="' + thumbSrc + '">' +
+            '<div class="thumb-fallback" hidden aria-hidden="true">' + icon + '</div>';
+        }
+        return '<div class="thumb-fallback" aria-hidden="true">' + icon + '</div>';
+      },
+
+      /** 카드 1장 생성 (그리드/이어보기 공용). index 는 state.videos 원본 인덱스 */
+      createCard: function (video, index) {
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-label', video.title + ' 재생');
+        card.dataset.index = String(index);
+
+        var ratio = video.slug ? progress.ratio(video.slug) : null;
+        var done = video.slug ? progress.isDone(video.slug) : false;
+
+        var statusHtml = '';
+        if (done) {
+          statusHtml = '<span class="card-status is-done">시청 완료</span>';
+        } else if (ratio !== null) {
+          statusHtml = '<span class="card-status">시청 중</span>';
+        }
+
+        var progressHtml = '';
+        if (ratio !== null) {
+          progressHtml = '<div class="card-progress"><div class="card-progress-fill" style="width:' +
+            Math.round(ratio * 100) + '%"></div></div>';
+        }
+
+        var badgesHtml =
+          '<div class="card-badges">' +
+            '<span class="card-badge">시연</span>' +
+            (video.pdf ? '<span class="card-badge is-pdf">PDF</span>' : '') +
+          '</div>';
+
+        card.innerHTML =
+          '<div class="card-thumb">' +
+            badgesHtml +
+            statusHtml +
+            this.thumbHtmlFor(video) +
+            '<div class="play-overlay" aria-hidden="true">' +
+              '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">' +
+                '<path d="M8 5v14l11-7z"/>' +
+              '</svg>' +
+            '</div>' +
+            '<span class="card-cache" hidden></span>' +
+            progressHtml +
+          '</div>' +
+          '<div class="card-body"><p class="card-title"></p></div>';
+
+        card.querySelector('.card-title').textContent = video.title;
+
+        var img = card.querySelector('img');
+        if (img) {
+          img.addEventListener('error', function () {
+            img.hidden = true;
+            var fallback = card.querySelector('.thumb-fallback');
+            if (fallback) fallback.hidden = false;
+          });
+        }
+
+        card.addEventListener('click', function () {
+          routing.goToVideo(index);
+        });
+
+        return card;
+      },
+
+      /** 현재 메모리 캐시맵 기준으로 모든 카드의 '저장됨/미저장' 핀 갱신 */
+      refreshCacheBadges: function () {
+        var disabled = cacheManager.disabled;
+        var cards = document.querySelectorAll('#card-grid .card, #continue-row .card');
+        cards.forEach(function (card) {
+          var badge = card.querySelector('.card-cache');
+          if (!badge) return;
+          var video = state.videos[parseInt(card.dataset.index, 10)];
+          var cacheable = video && video.source === 'embedded' &&
+            video.src && video.src.indexOf('blob:') !== 0;
+          if (disabled || !cacheable) {
+            badge.hidden = true;
+            return;
+          }
+          var cached = !!cacheManager.cachedKeys[video.src];
+          badge.hidden = false;
+          badge.classList.toggle('is-cached', cached);
+          badge.textContent = cached ? '저장됨' : '미저장';
+        });
+      },
+
+      collectCategories: function () {
+        var seen = {};
+        var list = [];
+        state.videos.forEach(function (v) {
+          if (v.category && !seen[v.category]) {
+            seen[v.category] = true;
+            list.push(v.category);
+          }
+        });
+        return list;
+      },
+
+      /** 검색어 + 카테고리 매칭 */
+      matches: function (video) {
+        var f = this.filter;
+        if (f.category !== 'all' && (video.category || '') !== f.category) {
+          return false;
+        }
+        var q = f.query.trim().toLowerCase();
+        if (q) {
+          var hay = (video.title || '') + ' ' + (video.category || '') + ' ' +
+            (video.tags || []).join(' ');
+          if (hay.toLowerCase().indexOf(q) === -1) return false;
+        }
+        return true;
+      },
+
+      renderCategoryChips: function (categories) {
+        var self = this;
+        els.categoryChips.innerHTML = '';
+        // 카테고리가 2개 미만이면 필터 의미가 없으므로 숨김
+        if (categories.length < 2) {
+          els.categoryChips.hidden = true;
+          return;
+        }
+        els.categoryChips.hidden = false;
+        ['all'].concat(categories).forEach(function (cat) {
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'chip';
+          chip.dataset.category = cat;
+          chip.textContent = cat === 'all' ? '전체' : cat;
+          chip.setAttribute('aria-pressed', self.filter.category === cat ? 'true' : 'false');
+          chip.addEventListener('click', function () {
+            self.filter.category = cat;
+            self.syncChipStates();
+            self.applyFilters();
+          });
+          els.categoryChips.appendChild(chip);
+        });
+      },
+
+      syncChipStates: function () {
+        var self = this;
+        els.categoryChips.querySelectorAll('.chip').forEach(function (chip) {
+          chip.setAttribute('aria-pressed',
+            chip.dataset.category === self.filter.category ? 'true' : 'false');
+        });
+      },
+
+      /** 이어보기 셸프: 진행 중(완료 아님) 영상을 최근 시청순으로 */
+      renderContinue: function () {
+        var self = this;
+        els.continueRow.innerHTML = '';
+        var entries = [];
+        state.videos.forEach(function (video, index) {
+          if (!video.slug || progress.ratio(video.slug) === null) return;
+          var p = progress.get(video.slug);
+          entries.push({ video: video, index: index, at: p ? p.at : 0 });
+        });
+        if (entries.length === 0) {
+          els.continueSection.hidden = true;
+          return;
+        }
+        entries.sort(function (a, b) { return b.at - a.at; });
+        entries.slice(0, 12).forEach(function (e) {
+          els.continueRow.appendChild(self.createCard(e.video, e.index));
+        });
+        els.continueSection.hidden = false;
+        this.refreshCacheBadges();
+      },
+
+      /** 현재 필터/정렬을 본 그리드에 반영 */
+      applyFilters: function () {
+        var self = this;
+        var entries = [];
+        state.videos.forEach(function (video, index) {
+          if (self.matches(video)) entries.push({ video: video, index: index });
+        });
+
+        if (this.filter.sort === 'title') {
+          entries.sort(function (a, b) {
+            return a.video.title.localeCompare(b.video.title, 'ko');
+          });
+        } else if (this.filter.sort === 'recent') {
+          entries.sort(function (a, b) {
+            var pa = a.video.slug ? progress.get(a.video.slug) : null;
+            var pb = b.video.slug ? progress.get(b.video.slug) : null;
+            return (pb ? pb.at : 0) - (pa ? pa.at : 0);
+          });
+        }
+        // 'default' 는 등록순(원본 인덱스) 유지
+
+        els.cardGrid.innerHTML = '';
+        entries.forEach(function (e) {
+          els.cardGrid.appendChild(self.createCard(e.video, e.index));
+        });
+
+        var total = state.videos.length;
+        var shown = entries.length;
+        els.cardGrid.hidden = shown === 0;
+        els.noResults.hidden = shown > 0;
+
+        var filtering = this.filter.query.trim() !== '' || this.filter.category !== 'all';
+        els.statsCount.textContent = filtering
+          ? '총 ' + total + '개 중 ' + shown + '개 표시'
+          : '총 ' + total + '개 시연 영상';
+
+        this.refreshCacheBadges();
+      },
+
+      render: function () {
+        var count = state.videos.length;
+
+        if (count === 0) {
+          els.emptyState.hidden = false;
+          els.statsStrip.hidden = true;
+          els.catalogToolbar.hidden = true;
+          els.continueSection.hidden = true;
+          els.gridHeading.hidden = true;
+          els.noResults.hidden = true;
+          els.cardGrid.hidden = false;
+          els.cardGrid.innerHTML = '';
+          return;
+        }
+
+        els.emptyState.hidden = true;
+        els.statsStrip.hidden = false;
+
+        var categories = this.collectCategories();
+        if (this.filter.category !== 'all' && categories.indexOf(this.filter.category) === -1) {
+          this.filter.category = 'all';
+        }
+
+        // 검색/정렬 도구는 영상이 2개 이상일 때만 노출 (작은 카탈로그는 깔끔하게)
+        els.catalogToolbar.hidden = count < 2;
+
+        this.renderCategoryChips(categories);
+        this.renderContinue();
+
+        // 이어보기 셸프가 보이면 본 그리드에 구분 제목 노출
+        els.gridHeading.hidden = els.continueSection.hidden;
+
+        this.applyFilters();
+        // 카드 캐시 핀(저장됨/미저장) 상태를 비동기로 반영
+        if (!cacheManager.disabled) {
+          cacheManager.refresh().then(function () {
+            dashboard.refreshCacheBadges();
+          });
+        }
+      },
+
+      bindControls: function () {
+        var self = this;
+
+        els.searchInput.addEventListener('input', function () {
+          self.filter.query = els.searchInput.value;
+          els.searchClear.hidden = els.searchInput.value === '';
+          self.applyFilters();
+        });
+
+        els.searchClear.addEventListener('click', function () {
+          els.searchInput.value = '';
+          self.filter.query = '';
+          els.searchClear.hidden = true;
+          self.applyFilters();
+          els.searchInput.focus();
+        });
+
+        els.sortSelect.addEventListener('change', function () {
+          self.filter.sort = els.sortSelect.value;
+          self.applyFilters();
+        });
+
+        els.continueClear.addEventListener('click', function () {
+          progress.clearAll();
+          self.render();
+        });
+      },
+
+      bindFolderPicker: function () {
+        function openPicker() {
+          els.folderInput.value = '';
+          els.folderInput.click();
+        }
+
+        els.btnPickFolder.addEventListener('click', openPicker);
+
+        els.folderInput.addEventListener('change', function (e) {
+          var files = e.target.files;
+          if (!files || files.length === 0) return;
+          var picked = catalog.fromPickerFiles(files);
+          if (picked.length === 0) return;
+
+          state.videos.forEach(function (v) {
+            if (v.source === 'picker' && v.src.indexOf('blob:') === 0) {
+              URL.revokeObjectURL(v.src);
+            }
+          });
+
+          var embedded = catalog.fromEmbedded(VIDEOS);
+          state.videos = embedded.length > 0 ? embedded.concat(picked) : picked;
+          dashboard.render();
+        });
+      }
+    };
+
+    var chapters = {
+      items: [],
+
+      render: function (videoName) {
+        var list = (typeof CHAPTERS !== 'undefined' && CHAPTERS[videoName]) ? CHAPTERS[videoName] : null;
+        els.chaptersList.innerHTML = '';
+        this.items = [];
+
+        if (!list || list.length === 0) {
+          els.chaptersSection.hidden = true;
+          return;
+        }
+
+        els.chaptersSection.hidden = false;
+        this.items = list.slice().sort(function (a, b) {
+          return a.time - b.time;
+        });
+
+        var self = this;
+        this.items.forEach(function (chapter, index) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'btn-chapter';
+          btn.dataset.index = String(index);
+          btn.setAttribute('aria-label', formatTime(chapter.time) + ' ' + chapter.label + '로 이동');
+
+          var timeSpan = document.createElement('span');
+          timeSpan.className = 'chapter-time';
+          timeSpan.textContent = formatTime(chapter.time);
+
+          var labelSpan = document.createElement('span');
+          labelSpan.className = 'chapter-label';
+          labelSpan.textContent = chapter.label;
+
+          btn.appendChild(timeSpan);
+          btn.appendChild(labelSpan);
+
+          btn.addEventListener('click', function () {
+            self.seekTo(index);
+          });
+
+          els.chaptersList.appendChild(btn);
+        });
+
+        this.renderMarkers();
+        this.updateActive(0);
+      },
+
+      /** 영상 길이를 알게 된 시점에 시크바 위 챕터 마커를 배치 (퍼센트 기준) */
+      renderMarkers: function () {
+        var container = els.chapterMarkers;
+        if (!container) return;
+        container.innerHTML = '';
+        var duration = els.playerVideo.duration;
+        if (this.items.length === 0 || !isFinite(duration) || duration <= 0) return;
+        this.items.forEach(function (chapter, index) {
+          var pct = Math.max(0, Math.min(100, (chapter.time / duration) * 100));
+          var mark = document.createElement('span');
+          mark.className = 'chapter-marker';
+          mark.style.left = pct + '%';
+          mark.dataset.index = String(index);
+          container.appendChild(mark);
+        });
+      },
+
+      seekTo: function (index) {
+        var chapter = this.items[index];
+        if (!chapter) return;
+        player.seekToTime(chapter.time, true);
+      },
+
+      updateActive: function (currentTime) {
+        if (this.items.length === 0) return;
+
+        var activeIndex = 0;
+        for (var i = 0; i < this.items.length; i++) {
+          if (currentTime + 0.05 >= this.items[i].time) {
+            activeIndex = i;
+          } else {
+            break;
+          }
+        }
+
+        var buttons = els.chaptersList.querySelectorAll('.btn-chapter');
+        buttons.forEach(function (btn, i) {
+          var isActive = i === activeIndex;
+          btn.classList.toggle('is-active', isActive);
+          btn.setAttribute('aria-current', isActive ? 'true' : 'false');
+          if (isActive) {
+            btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+          }
+        });
+
+        if (els.chapterMarkers) {
+          var marks = els.chapterMarkers.querySelectorAll('.chapter-marker');
+          marks.forEach(function (mark, i) {
+            mark.classList.toggle('is-active', i === activeIndex);
+          });
+        }
+      },
+
+      clear: function () {
+        this.items = [];
+        els.chaptersList.innerHTML = '';
+        els.chaptersSection.hidden = true;
+        if (els.chapterMarkers) els.chapterMarkers.innerHTML = '';
+      }
+    };
+
+    var speed = {
+      set: function (rate) {
+        state.speed = rate;
+        els.playerVideo.playbackRate = rate;
+        els.speedButtons.forEach(function (btn) {
+          var active = Number(btn.dataset.speed) === rate;
+          btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+      },
+
+      bind: function () {
+        els.speedButtons.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            speed.set(Number(btn.dataset.speed));
+          });
+        });
+      }
+    };
+
+    var player = {
+      setMediaAspect: function (width, height) {
+        if (!width || !height) return;
+        els.videoWrap.style.setProperty('--media-aspect', width + ' / ' + height);
+        els.videoWrap.style.setProperty('--media-aspect-ratio', String(width / height));
+        if (width >= 960) {
+          els.videoWrap.classList.add('is-hd-wide');
+        } else {
+          els.videoWrap.classList.remove('is-hd-wide');
+        }
+        this.syncFabPosition();
+      },
+
+      /** 접힘 상태의 PDF FAB를 영상 세로 중앙에 맞춘다 (영상 높이로 컨테이너 높이 동기화) */
+      syncFabPosition: function () {
+        var section = els.pdfSection;
+        if (!section || section.hidden) return;
+        var desktop = window.matchMedia('(min-width: 1024px)').matches;
+        var collapsed = !els.playerMain.classList.contains('is-pdf-open');
+        if (desktop && collapsed) {
+          var h = els.videoWrap.getBoundingClientRect().height;
+          if (h > 0) section.style.height = h + 'px';
+        } else {
+          section.style.removeProperty('height');
+        }
+      },
+
+      clearMediaAspect: function () {
+        els.videoWrap.style.removeProperty('--media-aspect');
+        els.videoWrap.style.removeProperty('--media-aspect-ratio');
+        els.videoWrap.classList.remove('is-hd-wide');
+      },
+
+      applyPosterAspect: function () {
+        var img = els.playerPoster;
+        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+          this.setMediaAspect(img.naturalWidth, img.naturalHeight);
+        }
+      },
+
+      applyVideoAspect: function () {
+        var v = els.playerVideo;
+        if (v.videoWidth > 0 && v.videoHeight > 0) {
+          this.setMediaAspect(v.videoWidth, v.videoHeight);
+        }
+      },
+
+      showPoster: function (video) {
+        var poster = '';
+        if (video.source === 'embedded' && typeof POSTERS !== 'undefined') {
+          poster = POSTERS[video.name] || '';
+        }
+        if (!poster && video.source === 'embedded' && typeof THUMBNAILS !== 'undefined') {
+          poster = THUMBNAILS[video.name] || '';
+        }
+        if (poster) {
+          var self = this;
+          els.playerPoster.onload = function () {
+            self.applyPosterAspect();
+          };
+          els.playerPoster.src = poster;
+          els.playerPoster.hidden = false;
+          els.videoWrap.classList.add('is-idle');
+          if (els.playerPoster.complete) {
+            self.applyPosterAspect();
+          }
+        } else {
+          els.playerPoster.hidden = true;
+          els.playerPoster.removeAttribute('src');
+          els.videoWrap.classList.remove('is-idle');
+        }
+      },
+
+      hidePoster: function () {
+        els.playerPoster.hidden = true;
+        els.videoWrap.classList.remove('is-idle');
+      },
+
+      setLoadingText: function (text) {
+        els.playerLoading.textContent = text;
+      },
+
+      resetLoadingText: function () {
+        els.playerLoading.textContent = state.loadingDefaultText;
+      },
+
+      cleanup: function () {
+        state.isBuffering = false;
+        state.bufferCallbacks = [];
+        state.videoSourceAttached = null;
+        state.metadataReady = false;
+        state.videoReady = false;
+        els.playerVideo.pause();
+        els.playerVideo.removeAttribute('src');
+        els.playerVideo.load();
+        els.playerPoster.hidden = true;
+        els.playerPoster.removeAttribute('src');
+        els.videoWrap.classList.remove('is-idle');
+        this.clearMediaAspect();
+        this.resetLoadingText();
+      },
+
+      isFullyBuffered: function () {
+        var v = els.playerVideo;
+        if (!v.duration || !isFinite(v.duration)) return false;
+        try {
+          for (var i = 0; i < v.buffered.length; i++) {
+            if (v.buffered.start(i) <= 0.5 && v.buffered.end(i) >= v.duration - 0.5) {
+              return true;
+            }
+          }
+        } catch (e) { /* ignore */ }
+        return false;
+      },
+
+      updateDownloadProgress: function (loaded, total) {
+        if (total > 0) {
+          var pct = Math.min(100, Math.round((loaded / total) * 100));
+          this.setLoadingText('영상 다운로드 중… ' + pct + '%');
+        } else {
+          this.setLoadingText('영상 다운로드 중…');
+        }
+      },
+
+      fetchResponseToBlob: function (response, onProgress) {
+        var self = this;
+        var total = parseInt(response.headers.get('Content-Length') || '0', 10);
+        var mime = response.headers.get('Content-Type') || 'video/mp4';
+
+        function report(loaded) {
+          if (onProgress) onProgress(loaded, total);
+          else self.updateDownloadProgress(loaded, total);
+        }
+
+        function validateSize(blob) {
+          if (total > 0 && Math.abs(blob.size - total) > 4096) {
+            throw new Error('incomplete download');
+          }
+          return { blob: blob, size: blob.size };
+        }
+
+        if (!response.body || !response.body.getReader) {
+          return response.blob().then(validateSize);
+        }
+        var reader = response.body.getReader();
+        var chunks = [];
+        var loaded = 0;
+        function pump() {
+          return reader.read().then(function (result) {
+            if (result.done) {
+              return validateSize(new Blob(chunks, { type: mime }));
+            }
+            chunks.push(result.value);
+            loaded += result.value.byteLength;
+            report(loaded);
+            return pump();
+          });
+        }
+        return pump();
+      },
+
+      fetchAndCacheVideo: function (key) {
+        var self = this;
+        if (key.indexOf('blob:') === 0) {
+          sessionBlobUrls[key] = key;
+          return Promise.resolve(key);
+        }
+        return fetch(key).then(function (response) {
+          if (!response.ok) {
+            throw new Error('download failed');
+          }
+          self.setLoadingText('영상 다운로드 중… 0%');
+          var total = parseInt(response.headers.get('Content-Length') || '0', 10);
+          return self.fetchResponseToBlob(response).then(function (result) {
+            if (sessionBlobUrls[key]) {
+              URL.revokeObjectURL(sessionBlobUrls[key]);
+            }
+            var blobUrl = URL.createObjectURL(result.blob);
+            sessionBlobUrls[key] = blobUrl;
+            return videoStore.put(key, result.blob, total || result.size).catch(function () {
+              /* 용량 부족 등으로 캐시 실패해도 세션 재생은 계속 */
+            }).then(function () {
+              return blobUrl;
+            });
+          });
+        });
+      },
+
+      resolveBlobUrl: function (key) {
+        if (sessionBlobUrls[key]) {
+          return Promise.resolve(sessionBlobUrls[key]);
+        }
+        if (key.indexOf('blob:') === 0) {
+          sessionBlobUrls[key] = key;
+          return Promise.resolve(key);
+        }
+        return videoStore.get(key).then(function (entry) {
+          if (!entry) return null;
+          var blobUrl = URL.createObjectURL(entry.blob);
+          sessionBlobUrls[key] = blobUrl;
+          return blobUrl;
+        }).catch(function () {
+          return null;
+        });
+      },
+
+      attachMediaSource: function (mediaSrc) {
+        var self = this;
+        var v = els.playerVideo;
+        return new Promise(function (resolve, reject) {
+          var settled = false;
+
+          function finish() {
+            if (settled) return;
+            if (!v.duration || !isFinite(v.duration)) return;
+            if (v.readyState < 3) return;
+            settled = true;
+            cleanup();
+            self.markMetadataReady();
+            self.applyVideoAspect();
+            state.videoReady = true;
+            els.playerLoading.hidden = true;
+            self.resetLoadingText();
+            resolve();
+          }
+
+          function cleanup() {
+            v.removeEventListener('loadedmetadata', onMeta);
+            v.removeEventListener('progress', onProgress);
+            v.removeEventListener('canplaythrough', onProgress);
+            v.removeEventListener('error', onError);
+          }
+
+          function onMeta() {
+            self.markMetadataReady();
+            self.applyVideoAspect();
+          }
+
+          function onProgress() {
+            if (v.buffered.length > 0 && v.duration) {
+              var buffered = v.buffered.end(v.buffered.length - 1);
+              var pct = Math.min(100, Math.round((buffered / v.duration) * 100));
+              self.setLoadingText('영상 준비 중… ' + pct + '%');
+            }
+            finish();
+          }
+
+          function onError() {
+            if (settled) return;
+            settled = true;
+            cleanup();
+            reject(new Error('video load failed'));
+          }
+
+          v.preload = 'auto';
+          v.src = mediaSrc;
+          v.addEventListener('loadedmetadata', onMeta, { once: true });
+          v.addEventListener('progress', onProgress);
+          v.addEventListener('canplaythrough', onProgress, { once: true });
+          v.addEventListener('error', onError, { once: true });
+        });
+      },
+
+      finishPrepare: function () {
+        state.isBuffering = false;
+        var callbacks = state.bufferCallbacks.slice();
+        state.bufferCallbacks = [];
+        callbacks.forEach(function (cb) {
+          cb();
+        });
+      },
+
+      failPrepare: function (message) {
+        state.isBuffering = false;
+        state.bufferCallbacks = [];
+        state.videoReady = false;
+        els.playerLoading.hidden = true;
+        this.resetLoadingText();
+        if (message) {
+          els.playerTitle.textContent += ' (' + message + ')';
+        }
+      },
+
+      /** 영상 전체 다운로드(또는 캐시) 후 재생; 실패 시 직접 URL 스트리밍 폴백 */
+      prepareVideoSource: function (callback) {
+        var self = this;
+        var key = state.pendingSrc;
+
+        if (!key) {
+          callback();
+          return;
+        }
+
+        if (state.videoSourceAttached === key && state.videoReady && els.playerVideo.src) {
+          callback();
+          return;
+        }
+
+        if (state.isBuffering) {
+          state.bufferCallbacks.push(callback);
+          return;
+        }
+
+        state.isBuffering = true;
+        state.bufferCallbacks = [callback];
+        els.playerLoading.hidden = false;
+
+        function runAttach(mediaSrc) {
+          state.videoSourceAttached = key;
+          return self.attachMediaSource(mediaSrc);
+        }
+
+        if (location.protocol === 'file:') {
+          self.setLoadingText('영상 불러오는 중…');
+          runAttach(key).then(function () {
+            self.finishPrepare();
+          }).catch(function () {
+            self.failPrepare('로컬 파일 재생 실패');
+          });
+          return;
+        }
+
+        self.resolveBlobUrl(key).then(function (blobUrl) {
+          if (blobUrl) {
+            self.setLoadingText('저장된 영상 불러오는 중…');
+            return blobUrl;
+          }
+          return self.fetchAndCacheVideo(key);
+        }).then(function (mediaSrc) {
+          return runAttach(mediaSrc);
+        }).then(function () {
+          self.finishPrepare();
+        }).catch(function () {
+          self.setLoadingText('직접 스트리밍으로 재생 중…');
+          return runAttach(key);
+        }).then(function () {
+          if (state.isBuffering) {
+            self.finishPrepare();
+          }
+        }).catch(function () {
+          self.failPrepare('다운로드 실패');
+        });
+      },
+
+      markMetadataReady: function () {
+        var v = els.playerVideo;
+        if (state.metadataReady) return;
+        state.metadataReady = true;
+        els.playerLoading.hidden = true;
+        var d = v.duration || 0;
+        if (d > 0) {
+          els.seekBar.max = String(d);
+          els.seekBar.disabled = false;
+          chapters.renderMarkers();
+        }
+      },
+
+      ensureReady: function (callback) {
+        this.prepareVideoSource(callback);
+      },
+
+      performSeek: function (targetTime, shouldPlay) {
+        var self = this;
+        var v = els.playerVideo;
+        if (!state.videoReady) return;
+        var d = v.duration || 0;
+        targetTime = Math.max(0, d > 0 ? Math.min(targetTime, d) : targetTime);
+
+        state.seeking = true;
+        els.seekBar.value = String(targetTime);
+        els.timeDisplay.textContent = formatTime(targetTime) + ' / ' + formatTime(d);
+        chapters.updateActive(targetTime);
+
+        function afterSeek() {
+          state.seeking = false;
+          v.muted = false;
+          self.updateSeek();
+          chapters.updateActive(v.currentTime);
+          routing.syncTime();
+          els.playerLoading.hidden = true;
+          if (shouldPlay) {
+            v.play().catch(function () {});
+          } else {
+            v.pause();
+          }
+        }
+
+        if (Math.abs(v.currentTime - targetTime) < 0.05) {
+          afterSeek();
+          return;
+        }
+
+        v.addEventListener('seeked', afterSeek, { once: true });
+        v.currentTime = targetTime;
+      },
+
+      seekToTime: function (time, shouldPlay) {
+        var self = this;
+        this.ensureReady(function () {
+          self.performSeek(time, shouldPlay);
+        });
+      },
+
+      updatePlayIcon: function () {
+        var playing = !els.playerVideo.paused;
+        els.iconPlay.hidden = playing;
+        els.iconPause.hidden = !playing;
+        els.btnPlay.setAttribute('aria-label', playing ? '일시정지' : '재생');
+      },
+
+      updateSeek: function () {
+        if (state.seeking) return;
+        var t = els.playerVideo.currentTime;
+        var d = els.playerVideo.duration || 0;
+        els.seekBar.value = String(t);
+        els.timeDisplay.textContent = formatTime(t) + ' / ' + formatTime(d);
+      },
+
+      togglePlay: function () {
+        var v = els.playerVideo;
+        if (!v.paused) {
+          v.pause();
+          return;
+        }
+        this.seekToTime(v.currentTime || 0, true);
+      },
+
+      reset: function () {
+        state.seeking = false;
+        state.metadataReady = false;
+        state.videoReady = false;
+        speed.set(1);
+        els.seekBar.max = '100';
+        els.seekBar.disabled = true;
+        this.updatePlayIcon();
+        els.seekBar.value = '0';
+        els.timeDisplay.textContent = '0:00 / --:--';
+        chapters.clear();
+      },
+
+      bind: function () {
+        var self = this;
+
+        els.btnBack.addEventListener('click', function () {
+          routing.goToDashboard();
+        });
+
+        els.btnPlay.addEventListener('click', function () {
+          self.togglePlay();
+        });
+
+        els.videoWrap.addEventListener('click', function () {
+          self.togglePlay();
+        });
+
+        els.playerVideo.addEventListener('loadedmetadata', function () {
+          player.markMetadataReady();
+          player.applyVideoAspect();
+          player.updateSeek();
+        });
+
+        els.playerVideo.addEventListener('waiting', function () {
+          if (state.metadataReady) {
+            els.playerLoading.hidden = false;
+          }
+        });
+
+        els.playerVideo.addEventListener('playing', function () {
+          els.playerLoading.hidden = true;
+          player.resetLoadingText();
+          els.playerVideo.muted = false;
+          player.hidePoster();
+        });
+
+        els.playerVideo.addEventListener('play', function () {
+          self.updatePlayIcon();
+        });
+
+        els.playerVideo.addEventListener('pause', function () {
+          self.updatePlayIcon();
+          progress.saveCurrent();
+        });
+
+        els.playerVideo.addEventListener('timeupdate', function () {
+          self.updateSeek();
+          chapters.updateActive(els.playerVideo.currentTime);
+          routing.syncTime();
+          progress.saveCurrent();
+        });
+
+        els.playerVideo.addEventListener('ended', function () {
+          self.updatePlayIcon();
+          progress.saveCurrent();
+        });
+
+        els.playerVideo.addEventListener('error', function () {
+          els.playerLoading.hidden = true;
+          els.playerTitle.textContent += ' (재생 실패)';
+        });
+
+        els.seekBar.addEventListener('input', function () {
+          state.seeking = true;
+          var t = parseFloat(els.seekBar.value);
+          var d = parseFloat(els.seekBar.max) || 0;
+          els.timeDisplay.textContent = formatTime(t) + ' / ' + formatTime(d);
+          chapters.updateActive(t);
+        });
+
+        els.seekBar.addEventListener('change', function () {
+          var t = parseFloat(els.seekBar.value);
+          var wasPlaying = !els.playerVideo.paused;
+          player.seekToTime(t, wasPlaying);
+        });
+
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape' && els.viewPlayer.classList.contains('is-active')) {
+            routing.goToDashboard();
+          }
+          if (e.key === ' ' && els.viewPlayer.classList.contains('is-active') &&
+              document.activeElement && document.activeElement.tagName !== 'INPUT') {
+            e.preventDefault();
+            self.togglePlay();
+          }
+          if (!els.pdfSection.hidden && els.viewPlayer.classList.contains('is-active')) {
+            if (e.key === 'ArrowLeft') {
+              e.preventDefault();
+              pdfViewer.prev();
+            } else if (e.key === 'ArrowRight') {
+              e.preventDefault();
+              pdfViewer.next();
+            }
+          }
+        });
+      },
+
+      pause: function () {
+        els.playerVideo.pause();
+        this.updatePlayIcon();
+      }
+    };
+
+    /**
+     * 영상별 오프라인 캐시 상태 — 카드 좌하단 '저장됨/미저장' 핀 표시용.
+     * 캐시 키는 영상 경로(video.src)와 동일(기존 fetchAndCacheVideo 와 호환).
+     * 영상은 재생 시 IndexedDB 에 자동 저장되며, 여기서는 저장 여부만 조회한다.
+     * file:// 환경은 캐시 조회 의미가 없어 비활성화.
+     */
+    var cacheManager = {
+      cachedKeys: {},
+      disabled: location.protocol === 'file:',
+
+      /** IndexedDB 키 목록으로 메모리 캐시맵 갱신 */
+      refresh: function () {
+        var self = this;
+        if (this.disabled) {
+          this.cachedKeys = {};
+          return Promise.resolve();
+        }
+        return videoStore.keys().then(function (keys) {
+          var map = {};
+          keys.forEach(function (k) { map[k] = true; });
+          self.cachedKeys = map;
+        }).catch(function () {
+          self.cachedKeys = self.cachedKeys || {};
+        });
+      }
+    };
+
+    function init() {
+      state.videos = catalog.fromEmbedded(VIDEOS);
+      dashboard.render();
+      dashboard.bindControls();
+      dashboard.bindFolderPicker();
+      speed.bind();
+      player.bind();
+      pdfViewer.bind();
+      routing.bind();
+
+      if (state.videos.length === 0) {
+        els.emptyState.hidden = false;
+      }
+
+      // 초기 해시(#video=…)가 있으면 해당 영상으로 바로 진입
+      routing.apply();
+    }
+
+    init();
+  })();
+  </script>
+</body>
+</html>

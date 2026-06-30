@@ -1,3 +1,9 @@
+# 루트(/) 접속 시 ax.html로 리다이렉트
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^$ ax.html [L,R=302]
+</IfModule>
+
 # Accept-Ranges 활성화 (Apache)
 <IfModule mod_headers.c>
   Header set Accept-Ranges bytes
