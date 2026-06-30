@@ -1,0 +1,17 @@
+{
+  "run_id": "b74fcef7",
+  "workspace": "/Users/a8922843/Desktop/mov",
+  "run_dir": "/Users/a8922843/Desktop/mov/.cursor/orchestration/runs/b74fcef7",
+  "user_request": "mp4/ thumbs/ pdf/ 폴더 구조 변경, 플레이어 하단 PDF 슬라이드 뷰어",
+  "status": "running",
+  "pipeline_profile": null,
+  "current_agent": null,
+  "agent_graph": [],
+  "attempts": {},
+  "total_iterations": 0,
+  "max_retries_per_agent": 2,
+  "max_total_iterations": 10,
+  "conditional_agents": [],
+  "created_at": "2026-06-30T11:38:47.231297+00:00",
+  "updated_at": "2026-06-30T11:38:47.231297+00:00"
+}

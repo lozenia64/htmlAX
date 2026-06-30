@@ -1,0 +1,17 @@
+{
+  "run_id": "bcde60c7",
+  "workspace": "/Users/a8922843/Desktop/mov",
+  "run_dir": "/Users/a8922843/Desktop/mov/.cursor/orchestration/runs/bcde60c7",
+  "user_request": "재생 시 전체 다운로드 및 시크 0:00 리셋 재수정 - 레인지 스트리밍",
+  "status": "running",
+  "pipeline_profile": null,
+  "current_agent": null,
+  "agent_graph": [],
+  "attempts": {},
+  "total_iterations": 0,
+  "max_retries_per_agent": 2,
+  "max_total_iterations": 10,
+  "conditional_agents": [],
+  "created_at": "2026-06-30T11:21:18.256781+00:00",
+  "updated_at": "2026-06-30T11:21:18.256781+00:00"
+}

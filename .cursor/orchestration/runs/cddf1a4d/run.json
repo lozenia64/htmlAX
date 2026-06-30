@@ -1,0 +1,17 @@
+{
+  "run_id": "cddf1a4d",
+  "workspace": "/Users/a8922843/Desktop/mov",
+  "run_dir": "/Users/a8922843/Desktop/mov/.cursor/orchestration/runs/cddf1a4d",
+  "user_request": "한글 과제명은 대시보드에 표시, 실제 영상/썸네일 파일은 영문 파일명만 사용하도록 개선",
+  "status": "running",
+  "pipeline_profile": null,
+  "current_agent": null,
+  "agent_graph": [],
+  "attempts": {},
+  "total_iterations": 0,
+  "max_retries_per_agent": 2,
+  "max_total_iterations": 10,
+  "conditional_agents": [],
+  "created_at": "2026-06-30T11:01:17.888983+00:00",
+  "updated_at": "2026-06-30T11:01:17.888983+00:00"
+}

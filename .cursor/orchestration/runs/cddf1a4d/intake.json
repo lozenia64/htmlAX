@@ -1,0 +1,7 @@
+{
+  "pipeline_profile": "feature",
+  "complexity": "medium",
+  "risk_flags": ["high_impact"],
+  "conditional_agents": [],
+  "rationale": "한글 과제명은 UI/CSV에 유지하고 실제 영상·썸네일 파일은 영문 파일명만 사용하도록 videos.csv 매핑 레이어와 VIDEOS 구조 변경이 필요합니다. NFC/NFD 불일치 문제도 함께 해소됩니다."
+}

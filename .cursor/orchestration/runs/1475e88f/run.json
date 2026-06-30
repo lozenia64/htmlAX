@@ -1,0 +1,17 @@
+{
+  "run_id": "1475e88f",
+  "workspace": "/Users/a8922843/Desktop/mov",
+  "run_dir": "/Users/a8922843/Desktop/mov/.cursor/orchestration/runs/1475e88f",
+  "user_request": "대용량 영상 다운로드 문제: 초기 로드 시 썸네일만, 재생 시 스트리밍/청크 다운로드, PC 전용",
+  "status": "running",
+  "pipeline_profile": null,
+  "current_agent": null,
+  "agent_graph": [],
+  "attempts": {},
+  "total_iterations": 0,
+  "max_retries_per_agent": 2,
+  "max_total_iterations": 10,
+  "conditional_agents": [],
+  "created_at": "2026-06-30T10:34:54.601142+00:00",
+  "updated_at": "2026-06-30T10:34:54.601142+00:00"
+}

@@ -1,0 +1,7 @@
+{
+  "pipeline_profile": "feature",
+  "complexity": "medium",
+  "risk_flags": ["user_facing"],
+  "conditional_agents": ["dev-ux-designer"],
+  "rationale": "고객사 솔루션 시연영상 B2B 포털 대시보드 UI 전면 개편. 2026 B2B SaaS 트렌드(achromatic+indigo accent, hero strip, 카드 그리드, enterprise polish) 반영 필요."
+}

@@ -1,0 +1,4 @@
+# Accept-Ranges 활성화 (Apache)
+<IfModule mod_headers.c>
+  Header set Accept-Ranges bytes
+</IfModule>

@@ -1,0 +1,17 @@
+{
+  "run_id": "f66a6994",
+  "workspace": "/Users/a8922843/Desktop/mov",
+  "run_dir": "/Users/a8922843/Desktop/mov/.cursor/orchestration/runs/f66a6994",
+  "user_request": "영상 재생 시 전체 다운로드 방지 및 시크 시 해당 구간부터 레인지 스트리밍, 0:00 리셋 버그 수정",
+  "status": "running",
+  "pipeline_profile": null,
+  "current_agent": null,
+  "agent_graph": [],
+  "attempts": {},
+  "total_iterations": 0,
+  "max_retries_per_agent": 2,
+  "max_total_iterations": 10,
+  "conditional_agents": [],
+  "created_at": "2026-06-30T11:12:11.678656+00:00",
+  "updated_at": "2026-06-30T11:12:11.678656+00:00"
+}

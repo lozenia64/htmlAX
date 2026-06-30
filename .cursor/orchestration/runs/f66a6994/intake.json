@@ -1,0 +1,7 @@
+{
+  "pipeline_profile": "hotfix",
+  "complexity": "medium",
+  "risk_flags": ["high_impact"],
+  "conditional_agents": [],
+  "rationale": "재생 시 전체 다운로드 및 시크 시 0:00 리셋 버그. deferred src 로딩, pendingSeek, seeked 이벤트 처리, MOV faststart 사전 처리 가이드 필요."
+}
