@@ -247,11 +247,17 @@
       z-index: 1;
     }
 
-    .card-badge {
+    .card-badges {
       position: absolute;
       top: 0.75rem;
       left: 0.75rem;
       z-index: 2;
+      display: flex;
+      gap: 0.375rem;
+      pointer-events: none;
+    }
+
+    .card-badge {
       padding: 0.25rem 0.625rem;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(8px);
@@ -263,7 +269,11 @@
       text-transform: uppercase;
       color: var(--accent);
       border: 1px solid rgba(79, 70, 229, 0.15);
-      pointer-events: none;
+    }
+
+    .card-badge.is-pdf {
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, 0.18);
     }
 
     .card-thumb img {
@@ -350,6 +360,350 @@
       .card-title {
         font-size: clamp(1rem, 0.5vw + 0.9rem, 1.125rem);
       }
+    }
+
+    /* Catalog toolbar: 검색 + 카테고리 필터 + 정렬 */
+    .catalog-toolbar {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem 1rem;
+      margin-bottom: clamp(1.5rem, 3vw, 2rem);
+    }
+
+    .catalog-toolbar[hidden] {
+      display: none;
+    }
+
+    .search-field {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1 1 240px;
+      min-width: 200px;
+      max-width: 26rem;
+    }
+
+    .search-field svg.search-icon {
+      position: absolute;
+      left: 0.875rem;
+      width: 18px;
+      height: 18px;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.625rem 2.25rem 0.625rem 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.9375rem;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      min-height: 28px;
+      border-radius: 50%;
+      color: var(--text-muted);
+      transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .search-clear[hidden] {
+      display: none;
+    }
+
+    .search-clear:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .search-clear:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .category-chips {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .category-chips[hidden] {
+      display: none;
+    }
+
+    .chip {
+      padding: 0.4rem 0.875rem;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      min-height: 2rem;
+      transition: background var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .chip:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .chip[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .chip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sort-field {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .sort-select {
+      padding: 0.5rem 2rem 0.5rem 0.875rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      -webkit-appearance: none;
+      appearance: none;
+      min-height: 2.25rem;
+    }
+
+    .sort-select:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .sort-field::after {
+      content: '';
+      position: absolute;
+      right: 0.875rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-right: 2px solid var(--text-muted);
+      border-bottom: 2px solid var(--text-muted);
+      transform: translateY(-25%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    /* 이어보기 셸프 */
+    .continue-section {
+      margin-bottom: clamp(2rem, 4vw, 2.75rem);
+    }
+
+    .continue-section[hidden] {
+      display: none;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: clamp(1.125rem, 1vw + 0.9rem, 1.375rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .text-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.375rem 0.625rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      min-height: auto;
+      min-width: auto;
+      transition: background var(--duration) var(--ease), color var(--duration) var(--ease);
+    }
+
+    .text-btn:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .text-btn:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .continue-row {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(min(80%, 280px), 1fr);
+      gap: clamp(1rem, 2vw, 1.5rem);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding-bottom: 0.5rem;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+    }
+
+    .continue-row .card {
+      scroll-snap-align: start;
+    }
+
+    #grid-heading {
+      margin: 0 0 1rem;
+    }
+
+    #grid-heading[hidden] {
+      display: none;
+    }
+
+    .no-results {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.75rem;
+      padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+      color: var(--text-muted);
+    }
+
+    .no-results[hidden] {
+      display: none;
+    }
+
+    .no-results svg {
+      width: 40px;
+      height: 40px;
+      opacity: 0.7;
+    }
+
+    .no-results p {
+      margin: 0;
+      font-size: 0.9375rem;
+    }
+
+    /* 카드 진행률 표시 */
+    .card-progress {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.35);
+      z-index: 2;
+    }
+
+    .card-progress[hidden] {
+      display: none;
+    }
+
+    .card-progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .card-status {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 2;
+      padding: 0.25rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      background: rgba(15, 23, 42, 0.72);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .card-status[hidden] {
+      display: none;
+    }
+
+    .card-status.is-done {
+      background: rgba(22, 163, 74, 0.88);
+    }
+
+    /* 캐시 상태 핀(카드 좌하단) */
+    .card-cache {
+      position: absolute;
+      left: 0.75rem;
+      bottom: 0.75rem;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: rgba(15, 23, 42, 0.66);
+      color: #fff;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .card-cache[hidden] {
+      display: none;
+    }
+
+    .card-cache.is-cached {
+      background: rgba(22, 163, 74, 0.9);
     }
 
     /* Player */
@@ -1062,7 +1416,49 @@
         <p>아래 버튼으로 동영상이 있는 폴더를 선택해 주세요.</p>
         <button type="button" id="btn-pick-folder" class="btn-primary">폴더 선택</button>
       </div>
+
+      <div id="catalog-toolbar" class="catalog-toolbar" hidden>
+        <div class="search-field">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="search" id="search-input" class="search-input" placeholder="시연 영상 검색…" aria-label="시연 영상 검색" autocomplete="off">
+          <button type="button" id="search-clear" class="search-clear" aria-label="검색어 지우기" hidden>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        <div id="category-chips" class="category-chips" role="group" aria-label="카테고리 필터" hidden></div>
+        <label class="sort-field">
+          <span class="sr-only">정렬 기준</span>
+          <select id="sort-select" class="sort-select">
+            <option value="default">기본순</option>
+            <option value="title">제목순</option>
+            <option value="recent">최근 시청순</option>
+          </select>
+        </label>
+      </div>
+
+      <section id="continue-section" class="continue-section" aria-label="이어보기" hidden>
+        <div class="section-head">
+          <h2 class="section-title">이어보기</h2>
+          <button type="button" id="continue-clear" class="text-btn">시청 기록 지우기</button>
+        </div>
+        <div id="continue-row" class="continue-row" role="list"></div>
+      </section>
+
+      <h2 id="grid-heading" class="section-title" hidden>전체 시연 영상</h2>
       <div id="card-grid" class="card-grid" role="list"></div>
+      <div id="no-results" class="no-results" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <p>검색 결과가 없습니다. 다른 검색어나 카테고리를 선택해 보세요.</p>
+      </div>
     </main>
   </div>
 
@@ -1267,6 +1663,20 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             tx.onerror = function () { reject(tx.error); };
           });
         });
+      },
+
+      /** 저장된 모든 키 목록 (blob 본체는 읽지 않음 → 가벼움) */
+      keys: function () {
+        return videoStore.openDb().then(function (db) {
+          return new Promise(function (resolve) {
+            var tx = db.transaction(videoStore.storeName, 'readonly');
+            var req = tx.objectStore(videoStore.storeName).getAllKeys();
+            req.onsuccess = function () { resolve(req.result || []); };
+            req.onerror = function () { resolve([]); };
+          });
+        }).catch(function () {
+          return [];
+        });
       }
     };
 
@@ -1279,6 +1689,16 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       statsCount: document.getElementById('stats-count'),
       btnPickFolder: document.getElementById('btn-pick-folder'),
       folderInput: document.getElementById('folder-input'),
+      catalogToolbar: document.getElementById('catalog-toolbar'),
+      searchInput: document.getElementById('search-input'),
+      searchClear: document.getElementById('search-clear'),
+      categoryChips: document.getElementById('category-chips'),
+      sortSelect: document.getElementById('sort-select'),
+      continueSection: document.getElementById('continue-section'),
+      continueRow: document.getElementById('continue-row'),
+      continueClear: document.getElementById('continue-clear'),
+      gridHeading: document.getElementById('grid-heading'),
+      noResults: document.getElementById('no-results'),
       btnBack: document.getElementById('btn-back'),
       playerTitle: document.getElementById('player-title'),
       videoWrap: document.getElementById('video-wrap'),
@@ -1342,6 +1762,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             slug: slugify(entry.file),
             pdf: entry.pdf || null,
             pdfPages: entry.pdfPages || null,
+            category: entry.category || null,
+            tags: Array.isArray(entry.tags) ? entry.tags : [],
             source: 'embedded'
           };
         });
@@ -1358,6 +1780,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             name: file.name,
             title: stripExtension(file.name),
             src: URL.createObjectURL(file),
+            category: null,
+            tags: [],
             source: 'picker'
           });
         }
@@ -1379,12 +1803,15 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         state.metadataReady = false;
         els.playerLoading.hidden = true;
         pdfViewer.close();
+        // 시청 진행률(이어보기/진행바)을 최신 상태로 다시 그림
+        dashboard.render();
       },
 
       showPlayer: function (index) {
         state.currentIndex = index;
         var video = state.videos[index];
         if (!video) return;
+        progress.lastSavedT = -1;
 
         els.viewDashboard.classList.remove('is-active');
         els.viewPlayer.classList.add('is-active');
@@ -1461,7 +1888,13 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         var video = state.videos[index];
         if (video && video.slug) {
           state.hasInternalHistory = true;
-          location.hash = 'video=' + encodeURIComponent(video.slug);
+          var hash = 'video=' + encodeURIComponent(video.slug);
+          // 이어보기: 저장된 위치가 있으면 그 지점부터 재생
+          var resume = progress.ratio(video.slug) !== null ? progress.get(video.slug) : null;
+          if (resume && resume.t >= progress.MIN_RESUME) {
+            hash += '&t=' + resume.t;
+          }
+          location.hash = hash;
         } else {
           router.showPlayer(index);
         }
@@ -1720,83 +2153,392 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       }
     };
 
+    /**
+     * 시청 진행률 — localStorage 영구 저장 (오프라인/내부망 동작).
+     * 키: slug(임베디드 영상만). picker(blob) 영상은 세션 한정이라 저장 안 함.
+     * 값: { t: 초, d: 총길이, at: 타임스탬프 }
+     */
+    var progress = {
+      storeKey: 'mov-demo-progress',
+      cache: null,
+      lastSavedT: -1,
+      /** 시청 완료로 간주하는 비율(이 이상이면 이어보기에서 제외) */
+      DONE_RATIO: 0.97,
+      /** 이어보기로 기록을 남기기 시작하는 최소 재생 초 */
+      MIN_RESUME: 5,
+
+      loadAll: function () {
+        if (this.cache) return this.cache;
+        try {
+          this.cache = JSON.parse(localStorage.getItem(this.storeKey) || '{}') || {};
+        } catch (e) {
+          this.cache = {};
+        }
+        return this.cache;
+      },
+
+      persist: function () {
+        try {
+          localStorage.setItem(this.storeKey, JSON.stringify(this.cache || {}));
+        } catch (e) { /* 용량 초과 등은 무시 */ }
+      },
+
+      get: function (slug) {
+        if (!slug) return null;
+        return this.loadAll()[slug] || null;
+      },
+
+      set: function (slug, t, d) {
+        if (!slug) return;
+        var all = this.loadAll();
+        all[slug] = { t: Math.floor(t), d: Math.floor(d) || 0, at: Date.now() };
+        this.cache = all;
+        this.persist();
+      },
+
+      remove: function (slug) {
+        if (!slug) return;
+        var all = this.loadAll();
+        if (all[slug]) {
+          delete all[slug];
+          this.persist();
+        }
+      },
+
+      clearAll: function () {
+        this.cache = {};
+        this.persist();
+      },
+
+      /** 0~1 진행 비율. 완료(거의 끝)면 null 반환 → 이어보기 미노출 */
+      ratio: function (slug) {
+        var p = this.get(slug);
+        if (!p || !p.d) return null;
+        var r = Math.max(0, Math.min(1, p.t / p.d));
+        return r >= this.DONE_RATIO ? null : r;
+      },
+
+      isDone: function (slug) {
+        var p = this.get(slug);
+        if (!p || !p.d) return false;
+        return (p.t / p.d) >= this.DONE_RATIO;
+      },
+
+      /** timeupdate 시 호출 — 정수 초가 바뀔 때만 저장 */
+      saveCurrent: function () {
+        if (state.currentIndex < 0) return;
+        var video = state.videos[state.currentIndex];
+        if (!video || !video.slug) return;
+        var v = els.playerVideo;
+        var t = Math.floor(v.currentTime || 0);
+        if (t === this.lastSavedT) return;
+        this.lastSavedT = t;
+        var d = v.duration || 0;
+        if (!isFinite(d) || d <= 0) return;
+        if ((t / d) >= this.DONE_RATIO || t >= d - 1) {
+          // 거의 다 봄 → 완료로 기록(이어보기 제외, 카드엔 '시청 완료')
+          this.set(video.slug, d, d);
+        } else if (t >= this.MIN_RESUME) {
+          this.set(video.slug, t, d);
+        }
+      }
+    };
+
     var dashboard = {
+      /** 현재 대시보드 필터 상태 */
+      filter: { query: '', category: 'all', sort: 'default' },
+
       thumbFor: function (video) {
         if (video.source !== 'embedded' || typeof THUMBNAILS === 'undefined') return '';
         return THUMBNAILS[video.name] || '';
       },
 
+      thumbHtmlFor: function (video) {
+        var icon =
+          '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
+            '<rect x="2" y="4" width="20" height="16" rx="2"/>' +
+            '<path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>' +
+          '</svg>';
+        var thumbSrc = this.thumbFor(video);
+        if (thumbSrc) {
+          return '<img loading="lazy" alt="" src="' + thumbSrc + '">' +
+            '<div class="thumb-fallback" hidden aria-hidden="true">' + icon + '</div>';
+        }
+        return '<div class="thumb-fallback" aria-hidden="true">' + icon + '</div>';
+      },
+
+      /** 카드 1장 생성 (그리드/이어보기 공용). index 는 state.videos 원본 인덱스 */
+      createCard: function (video, index) {
+        var card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-label', video.title + ' 재생');
+        card.dataset.index = String(index);
+
+        var ratio = video.slug ? progress.ratio(video.slug) : null;
+        var done = video.slug ? progress.isDone(video.slug) : false;
+
+        var statusHtml = '';
+        if (done) {
+          statusHtml = '<span class="card-status is-done">시청 완료</span>';
+        } else if (ratio !== null) {
+          statusHtml = '<span class="card-status">시청 중</span>';
+        }
+
+        var progressHtml = '';
+        if (ratio !== null) {
+          progressHtml = '<div class="card-progress"><div class="card-progress-fill" style="width:' +
+            Math.round(ratio * 100) + '%"></div></div>';
+        }
+
+        var badgesHtml =
+          '<div class="card-badges">' +
+            '<span class="card-badge">시연</span>' +
+            (video.pdf ? '<span class="card-badge is-pdf">PDF</span>' : '') +
+          '</div>';
+
+        card.innerHTML =
+          '<div class="card-thumb">' +
+            badgesHtml +
+            statusHtml +
+            this.thumbHtmlFor(video) +
+            '<div class="play-overlay" aria-hidden="true">' +
+              '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">' +
+                '<path d="M8 5v14l11-7z"/>' +
+              '</svg>' +
+            '</div>' +
+            '<span class="card-cache" hidden></span>' +
+            progressHtml +
+          '</div>' +
+          '<div class="card-body"><p class="card-title"></p></div>';
+
+        card.querySelector('.card-title').textContent = video.title;
+
+        var img = card.querySelector('img');
+        if (img) {
+          img.addEventListener('error', function () {
+            img.hidden = true;
+            var fallback = card.querySelector('.thumb-fallback');
+            if (fallback) fallback.hidden = false;
+          });
+        }
+
+        card.addEventListener('click', function () {
+          routing.goToVideo(index);
+        });
+
+        return card;
+      },
+
+      /** 현재 메모리 캐시맵 기준으로 모든 카드의 '저장됨/미저장' 핀 갱신 */
+      refreshCacheBadges: function () {
+        var disabled = cacheManager.disabled;
+        var cards = document.querySelectorAll('#card-grid .card, #continue-row .card');
+        cards.forEach(function (card) {
+          var badge = card.querySelector('.card-cache');
+          if (!badge) return;
+          var video = state.videos[parseInt(card.dataset.index, 10)];
+          var cacheable = video && video.source === 'embedded' &&
+            video.src && video.src.indexOf('blob:') !== 0;
+          if (disabled || !cacheable) {
+            badge.hidden = true;
+            return;
+          }
+          var cached = !!cacheManager.cachedKeys[video.src];
+          badge.hidden = false;
+          badge.classList.toggle('is-cached', cached);
+          badge.textContent = cached ? '저장됨' : '미저장';
+        });
+      },
+
+      collectCategories: function () {
+        var seen = {};
+        var list = [];
+        state.videos.forEach(function (v) {
+          if (v.category && !seen[v.category]) {
+            seen[v.category] = true;
+            list.push(v.category);
+          }
+        });
+        return list;
+      },
+
+      /** 검색어 + 카테고리 매칭 */
+      matches: function (video) {
+        var f = this.filter;
+        if (f.category !== 'all' && (video.category || '') !== f.category) {
+          return false;
+        }
+        var q = f.query.trim().toLowerCase();
+        if (q) {
+          var hay = (video.title || '') + ' ' + (video.category || '') + ' ' +
+            (video.tags || []).join(' ');
+          if (hay.toLowerCase().indexOf(q) === -1) return false;
+        }
+        return true;
+      },
+
+      renderCategoryChips: function (categories) {
+        var self = this;
+        els.categoryChips.innerHTML = '';
+        // 카테고리가 2개 미만이면 필터 의미가 없으므로 숨김
+        if (categories.length < 2) {
+          els.categoryChips.hidden = true;
+          return;
+        }
+        els.categoryChips.hidden = false;
+        ['all'].concat(categories).forEach(function (cat) {
+          var chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'chip';
+          chip.dataset.category = cat;
+          chip.textContent = cat === 'all' ? '전체' : cat;
+          chip.setAttribute('aria-pressed', self.filter.category === cat ? 'true' : 'false');
+          chip.addEventListener('click', function () {
+            self.filter.category = cat;
+            self.syncChipStates();
+            self.applyFilters();
+          });
+          els.categoryChips.appendChild(chip);
+        });
+      },
+
+      syncChipStates: function () {
+        var self = this;
+        els.categoryChips.querySelectorAll('.chip').forEach(function (chip) {
+          chip.setAttribute('aria-pressed',
+            chip.dataset.category === self.filter.category ? 'true' : 'false');
+        });
+      },
+
+      /** 이어보기 셸프: 진행 중(완료 아님) 영상을 최근 시청순으로 */
+      renderContinue: function () {
+        var self = this;
+        els.continueRow.innerHTML = '';
+        var entries = [];
+        state.videos.forEach(function (video, index) {
+          if (!video.slug || progress.ratio(video.slug) === null) return;
+          var p = progress.get(video.slug);
+          entries.push({ video: video, index: index, at: p ? p.at : 0 });
+        });
+        if (entries.length === 0) {
+          els.continueSection.hidden = true;
+          return;
+        }
+        entries.sort(function (a, b) { return b.at - a.at; });
+        entries.slice(0, 12).forEach(function (e) {
+          els.continueRow.appendChild(self.createCard(e.video, e.index));
+        });
+        els.continueSection.hidden = false;
+        this.refreshCacheBadges();
+      },
+
+      /** 현재 필터/정렬을 본 그리드에 반영 */
+      applyFilters: function () {
+        var self = this;
+        var entries = [];
+        state.videos.forEach(function (video, index) {
+          if (self.matches(video)) entries.push({ video: video, index: index });
+        });
+
+        if (this.filter.sort === 'title') {
+          entries.sort(function (a, b) {
+            return a.video.title.localeCompare(b.video.title, 'ko');
+          });
+        } else if (this.filter.sort === 'recent') {
+          entries.sort(function (a, b) {
+            var pa = a.video.slug ? progress.get(a.video.slug) : null;
+            var pb = b.video.slug ? progress.get(b.video.slug) : null;
+            return (pb ? pb.at : 0) - (pa ? pa.at : 0);
+          });
+        }
+        // 'default' 는 등록순(원본 인덱스) 유지
+
+        els.cardGrid.innerHTML = '';
+        entries.forEach(function (e) {
+          els.cardGrid.appendChild(self.createCard(e.video, e.index));
+        });
+
+        var total = state.videos.length;
+        var shown = entries.length;
+        els.cardGrid.hidden = shown === 0;
+        els.noResults.hidden = shown > 0;
+
+        var filtering = this.filter.query.trim() !== '' || this.filter.category !== 'all';
+        els.statsCount.textContent = filtering
+          ? '총 ' + total + '개 중 ' + shown + '개 표시'
+          : '총 ' + total + '개 시연 영상';
+
+        this.refreshCacheBadges();
+      },
+
       render: function () {
         var count = state.videos.length;
-        els.cardGrid.innerHTML = '';
 
         if (count === 0) {
           els.emptyState.hidden = false;
           els.statsStrip.hidden = true;
+          els.catalogToolbar.hidden = true;
+          els.continueSection.hidden = true;
+          els.gridHeading.hidden = true;
+          els.noResults.hidden = true;
+          els.cardGrid.hidden = false;
+          els.cardGrid.innerHTML = '';
           return;
         }
 
         els.emptyState.hidden = true;
         els.statsStrip.hidden = false;
-        els.statsCount.textContent = '총 ' + count + '개 시연 영상';
 
-        state.videos.forEach(function (video, index) {
-          var card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'card';
-          card.setAttribute('role', 'listitem');
-          card.setAttribute('aria-label', video.title + ' 재생');
-          card.dataset.index = String(index);
+        var categories = this.collectCategories();
+        if (this.filter.category !== 'all' && categories.indexOf(this.filter.category) === -1) {
+          this.filter.category = 'all';
+        }
 
-          var thumbSrc = dashboard.thumbFor(video);
-          var thumbHtml;
-          if (thumbSrc) {
-            thumbHtml =
-              '<img loading="lazy" alt="" src="' + thumbSrc + '">' +
-              '<div class="thumb-fallback" hidden aria-hidden="true">' +
-                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
-                  '<rect x="2" y="4" width="20" height="16" rx="2"/>' +
-                  '<path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>' +
-                '</svg>' +
-              '</div>';
-          } else {
-            thumbHtml =
-              '<div class="thumb-fallback" aria-hidden="true">' +
-                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">' +
-                  '<rect x="2" y="4" width="20" height="16" rx="2"/>' +
-                  '<path d="M10 9l5 3-5 3V9z" fill="currentColor" stroke="none"/>' +
-                '</svg>' +
-              '</div>';
-          }
+        // 검색/정렬 도구는 영상이 2개 이상일 때만 노출 (작은 카탈로그는 깔끔하게)
+        els.catalogToolbar.hidden = count < 2;
 
-          card.innerHTML =
-            '<div class="card-thumb">' +
-              '<span class="card-badge">시연</span>' +
-              thumbHtml +
-              '<div class="play-overlay" aria-hidden="true">' +
-                '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">' +
-                  '<path d="M8 5v14l11-7z"/>' +
-                '</svg>' +
-              '</div>' +
-            '</div>' +
-            '<div class="card-body"><p class="card-title"></p></div>';
+        this.renderCategoryChips(categories);
+        this.renderContinue();
 
-          card.querySelector('.card-title').textContent = video.title;
+        // 이어보기 셸프가 보이면 본 그리드에 구분 제목 노출
+        els.gridHeading.hidden = els.continueSection.hidden;
 
-          var img = card.querySelector('img');
-          if (img) {
-            img.addEventListener('error', function () {
-              img.hidden = true;
-              var fallback = card.querySelector('.thumb-fallback');
-              if (fallback) fallback.hidden = false;
-            });
-          }
-
-          card.addEventListener('click', function () {
-            routing.goToVideo(index);
+        this.applyFilters();
+        // 카드 캐시 핀(저장됨/미저장) 상태를 비동기로 반영
+        if (!cacheManager.disabled) {
+          cacheManager.refresh().then(function () {
+            dashboard.refreshCacheBadges();
           });
+        }
+      },
 
-          els.cardGrid.appendChild(card);
+      bindControls: function () {
+        var self = this;
+
+        els.searchInput.addEventListener('input', function () {
+          self.filter.query = els.searchInput.value;
+          els.searchClear.hidden = els.searchInput.value === '';
+          self.applyFilters();
+        });
+
+        els.searchClear.addEventListener('click', function () {
+          els.searchInput.value = '';
+          self.filter.query = '';
+          els.searchClear.hidden = true;
+          self.applyFilters();
+          els.searchInput.focus();
+        });
+
+        els.sortSelect.addEventListener('change', function () {
+          self.filter.sort = els.sortSelect.value;
+          self.applyFilters();
+        });
+
+        els.continueClear.addEventListener('click', function () {
+          progress.clearAll();
+          self.render();
         });
       },
 
@@ -2079,10 +2821,15 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         }
       },
 
-      fetchResponseToBlob: function (response) {
+      fetchResponseToBlob: function (response, onProgress) {
         var self = this;
         var total = parseInt(response.headers.get('Content-Length') || '0', 10);
         var mime = response.headers.get('Content-Type') || 'video/mp4';
+
+        function report(loaded) {
+          if (onProgress) onProgress(loaded, total);
+          else self.updateDownloadProgress(loaded, total);
+        }
 
         function validateSize(blob) {
           if (total > 0 && Math.abs(blob.size - total) > 4096) {
@@ -2104,7 +2851,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             }
             chunks.push(result.value);
             loaded += result.value.byteLength;
-            self.updateDownloadProgress(loaded, total);
+            report(loaded);
             return pump();
           });
         }
@@ -2430,16 +3177,19 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
         els.playerVideo.addEventListener('pause', function () {
           self.updatePlayIcon();
+          progress.saveCurrent();
         });
 
         els.playerVideo.addEventListener('timeupdate', function () {
           self.updateSeek();
           chapters.updateActive(els.playerVideo.currentTime);
           routing.syncTime();
+          progress.saveCurrent();
         });
 
         els.playerVideo.addEventListener('ended', function () {
           self.updatePlayIcon();
+          progress.saveCurrent();
         });
 
         els.playerVideo.addEventListener('error', function () {
@@ -2488,9 +3238,37 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       }
     };
 
+    /**
+     * 영상별 오프라인 캐시 상태 — 카드 좌하단 '저장됨/미저장' 핀 표시용.
+     * 캐시 키는 영상 경로(video.src)와 동일(기존 fetchAndCacheVideo 와 호환).
+     * 영상은 재생 시 IndexedDB 에 자동 저장되며, 여기서는 저장 여부만 조회한다.
+     * file:// 환경은 캐시 조회 의미가 없어 비활성화.
+     */
+    var cacheManager = {
+      cachedKeys: {},
+      disabled: location.protocol === 'file:',
+
+      /** IndexedDB 키 목록으로 메모리 캐시맵 갱신 */
+      refresh: function () {
+        var self = this;
+        if (this.disabled) {
+          this.cachedKeys = {};
+          return Promise.resolve();
+        }
+        return videoStore.keys().then(function (keys) {
+          var map = {};
+          keys.forEach(function (k) { map[k] = true; });
+          self.cachedKeys = map;
+        }).catch(function () {
+          self.cachedKeys = self.cachedKeys || {};
+        });
+      }
+    };
+
     function init() {
       state.videos = catalog.fromEmbedded(VIDEOS);
       dashboard.render();
+      dashboard.bindControls();
       dashboard.bindFolderPicker();
       speed.bind();
       player.bind();
