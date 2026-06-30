@@ -1,7 +1,8 @@
-# 루트(/) 접속 시 ax.html로 리다이렉트
+# 루트(/) 및 index.html 접속 시 ax.html로 리다이렉트
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteRule ^$ ax.html [L,R=302]
+  RewriteRule ^index\.html$ ax.html [L,R=302,QSA]
 </IfModule>
 
 # Accept-Ranges 활성화 (Apache)
