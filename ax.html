@@ -1021,7 +1021,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       bufferCallbacks: [],
       videoSourceAttached: null,
       videoReady: false,
-      loadingDefaultText: '불러오는 중…'
+      loadingDefaultText: '불러오는 중…',
+      hasInternalHistory: false
     };
 
     /** 세션 내 Blob URL (목록 복귀 시 재사용, 새로고침 전까지) */
@@ -1148,6 +1149,12 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       return name.replace(/\.[^.]+$/, '');
     }
 
+    /** 영상 식별용 슬러그 (파일명 기준, 경로/확장자 제거) — 딥링크 #video= 값 */
+    function slugify(name) {
+      var base = String(name || '').split('/').pop();
+      return stripExtension(base);
+    }
+
     function formatTime(seconds) {
       if (!isFinite(seconds) || seconds < 0) return '0:00';
       var m = Math.floor(seconds / 60);
@@ -1163,6 +1170,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
               name: entry,
               title: stripExtension(entry),
               src: entry,
+              slug: slugify(entry),
               source: 'embedded'
             };
           }
@@ -1170,6 +1178,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             name: entry.file,
             title: entry.title,
             src: entry.file,
+            slug: slugify(entry.file),
             pdf: entry.pdf || null,
             pdfPages: entry.pdfPages || null,
             source: 'embedded'
@@ -1232,6 +1241,116 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       }
     };
 
+    /**
+     * 해시 기반 딥링크 라우팅.
+     * 형식: #video=<slug>&t=<초>&pdf
+     *  - 카드 클릭 → location.hash 갱신(히스토리 push) → hashchange → apply()
+     *  - 재생 위치/ PDF 펼침 상태는 replaceState 로 URL 에 반영(히스토리 미증가, 북마크 재개용)
+     */
+    var routing = {
+      lastWrittenTime: -1,
+
+      parse: function () {
+        var raw = location.hash.replace(/^#/, '');
+        if (!raw) return null;
+        var params = {};
+        raw.split('&').forEach(function (pair) {
+          if (!pair) return;
+          var eq = pair.indexOf('=');
+          var key = decodeURIComponent(eq === -1 ? pair : pair.slice(0, eq));
+          var val = eq === -1 ? '' : decodeURIComponent(pair.slice(eq + 1));
+          if (key) params[key] = val;
+        });
+        return params;
+      },
+
+      findIndexBySlug: function (slug) {
+        for (var i = 0; i < state.videos.length; i++) {
+          if (state.videos[i].slug === slug) return i;
+        }
+        return -1;
+      },
+
+      /** 현재 해시를 읽어 해당 뷰로 동기화 (초기 로드 + hashchange) */
+      apply: function () {
+        this.lastWrittenTime = -1;
+        var params = this.parse();
+        if (!params || !params.video) {
+          router.showDashboard();
+          return;
+        }
+        var index = this.findIndexBySlug(params.video);
+        if (index < 0) {
+          router.showDashboard();
+          return;
+        }
+        router.showPlayer(index);
+        var video = state.videos[index];
+        if ('pdf' in params && video.pdf) {
+          pdfViewer.expand();
+        }
+        var t = parseFloat(params.t);
+        if (isFinite(t) && t > 0) {
+          player.seekToTime(t, false);
+        }
+      },
+
+      /** 영상 진입(히스토리 push). slug 없는 로컬(picker) 영상은 직접 표시 */
+      goToVideo: function (index) {
+        var video = state.videos[index];
+        if (video && video.slug) {
+          state.hasInternalHistory = true;
+          location.hash = 'video=' + encodeURIComponent(video.slug);
+        } else {
+          router.showPlayer(index);
+        }
+      },
+
+      /** 목록 복귀: 내부 히스토리가 있으면 뒤로가기, 아니면 해시 비우기 */
+      goToDashboard: function () {
+        if (location.hash) {
+          if (state.hasInternalHistory) {
+            history.back();
+          } else {
+            location.hash = '';
+          }
+        } else {
+          router.showDashboard();
+        }
+      },
+
+      /** 현재 플레이어 상태(영상/시간/PDF)를 URL 에 반영 — 히스토리 증가 없음 */
+      writeState: function () {
+        if (state.currentIndex < 0) return;
+        var video = state.videos[state.currentIndex];
+        if (!video || !video.slug) return;
+        if (!els.viewPlayer.classList.contains('is-active')) return;
+        var parts = 'video=' + encodeURIComponent(video.slug);
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t > 0) parts += '&t=' + t;
+        if (pdfViewer.expanded) parts += '&pdf';
+        try {
+          history.replaceState(null, '', '#' + parts);
+        } catch (e) { /* ignore */ }
+      },
+
+      /** 재생 중 정수 초가 바뀔 때만 URL 시간 갱신 (북마크 재개) */
+      syncTime: function () {
+        if (state.currentIndex < 0) return;
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t === this.lastWrittenTime) return;
+        this.lastWrittenTime = t;
+        this.writeState();
+      },
+
+      bind: function () {
+        var self = this;
+        window.addEventListener('hashchange', function () {
+          self.apply();
+        });
+      }
+    };
+
     var pdfViewer = {
       doc: null,
       pendingPath: null,
@@ -1274,12 +1393,14 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         if (!this.doc && this.pendingPath) {
           this.loadDocument(this.pendingPath);
         }
+        routing.writeState();
       },
 
       collapse: function () {
         this.expanded = false;
         els.pdfCardBody.hidden = true;
         els.pdfCardToggle.setAttribute('aria-expanded', 'false');
+        routing.writeState();
       },
 
       loadDocument: function (path) {
@@ -1501,7 +1622,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           }
 
           card.addEventListener('click', function () {
-            router.showPlayer(index);
+            routing.goToVideo(index);
           });
 
           els.cardGrid.appendChild(card);
@@ -1994,6 +2115,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           v.muted = false;
           self.updateSeek();
           chapters.updateActive(v.currentTime);
+          routing.syncTime();
           els.playerLoading.hidden = true;
           if (shouldPlay) {
             v.play().catch(function () {});
@@ -2059,7 +2181,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         var self = this;
 
         els.btnBack.addEventListener('click', function () {
-          router.showDashboard();
+          routing.goToDashboard();
         });
 
         els.btnPlay.addEventListener('click', function () {
@@ -2096,6 +2218,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.playerVideo.addEventListener('timeupdate', function () {
           self.updateSeek();
           chapters.updateActive(els.playerVideo.currentTime);
+          routing.syncTime();
         });
 
         els.playerVideo.addEventListener('ended', function () {
@@ -2123,7 +2246,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && els.viewPlayer.classList.contains('is-active')) {
-            router.showDashboard();
+            routing.goToDashboard();
           }
           if (e.key === ' ' && els.viewPlayer.classList.contains('is-active') &&
               document.activeElement && document.activeElement.tagName !== 'INPUT') {
@@ -2155,10 +2278,14 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       speed.bind();
       player.bind();
       pdfViewer.bind();
+      routing.bind();
 
       if (state.videos.length === 0) {
         els.emptyState.hidden = false;
       }
+
+      // 초기 해시(#video=…)가 있으면 해당 영상으로 바로 진입
+      routing.apply();
     }
 
     init();
