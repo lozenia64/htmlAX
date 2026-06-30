@@ -247,11 +247,17 @@
       z-index: 1;
     }
 
-    .card-badge {
+    .card-badges {
       position: absolute;
       top: 0.75rem;
       left: 0.75rem;
       z-index: 2;
+      display: flex;
+      gap: 0.375rem;
+      pointer-events: none;
+    }
+
+    .card-badge {
       padding: 0.25rem 0.625rem;
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(8px);
@@ -263,7 +269,11 @@
       text-transform: uppercase;
       color: var(--accent);
       border: 1px solid rgba(79, 70, 229, 0.15);
-      pointer-events: none;
+    }
+
+    .card-badge.is-pdf {
+      color: #dc2626;
+      border-color: rgba(220, 38, 38, 0.18);
     }
 
     .card-thumb img {
@@ -2413,9 +2423,15 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             Math.round(ratio * 100) + '%"></div></div>';
         }
 
+        var badgesHtml =
+          '<div class="card-badges">' +
+            '<span class="card-badge">시연</span>' +
+            (video.pdf ? '<span class="card-badge is-pdf">PDF</span>' : '') +
+          '</div>';
+
         card.innerHTML =
           '<div class="card-thumb">' +
-            '<span class="card-badge">시연</span>' +
+            badgesHtml +
             statusHtml +
             this.thumbHtmlFor(video) +
             '<div class="play-overlay" aria-hidden="true">' +
