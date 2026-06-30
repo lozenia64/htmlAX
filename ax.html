@@ -412,6 +412,99 @@
         radial-gradient(circle at 80% 80%, rgba(79, 70, 229, 0.04) 0%, transparent 45%);
     }
 
+    /* 영상 + 컨트롤(좌)과 PDF(우)를 담는 무대. 기본은 세로 스택(현행 유지) */
+    .player-stage {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-primary {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    /* 데스크톱: PDF 카드는 항상 영상 우측. 접힘=작은 카드, 펼침=읽기 컬럼 */
+    @media (min-width: 1024px) {
+      .player-main.has-pdf .player-stage {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+        max-width: 1560px;
+        margin-inline: auto;
+      }
+      .player-main.has-pdf .player-primary {
+        flex: 1 1 auto;
+        max-width: 960px;
+        min-width: 0;
+      }
+      /* 접힘: 영상 우측 '중앙'에 떠 있는 원형 문서 버튼
+         (#pdf-section 높이를 영상 높이에 맞춰 JS로 동기화 → FAB가 영상 세로 중앙에 정렬) */
+      .player-main.has-pdf:not(.is-pdf-open) #pdf-section {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: none;
+        align-self: flex-start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        overflow: visible;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header {
+        width: 56px;
+        min-width: 56px;
+        height: 56px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow-md);
+        color: var(--accent);
+        transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-header:hover {
+        background: var(--accent-soft);
+        box-shadow: var(--shadow-hover);
+        transform: translateY(-1px);
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-title,
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-chevron {
+        display: none;
+      }
+      .player-main.has-pdf:not(.is-pdf-open) .pdf-card-icon {
+        display: inline-flex;
+      }
+      /* 펼침: 읽기 컬럼으로 확장, 영상 높이에 맞춰 늘어남 */
+      .player-main.is-pdf-open #pdf-section {
+        flex: 0 0 auto;
+        width: clamp(360px, 38%, 680px);
+        max-width: 680px;
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+      }
+      .player-main.is-pdf-open .pdf-card-body {
+        flex: 1;
+        min-height: 0;
+      }
+      .player-main.is-pdf-open .pdf-slide-view {
+        height: auto;
+        flex: 1;
+        min-height: 320px;
+      }
+    }
+
     .video-wrap {
       width: 100%;
       max-width: 960px;
@@ -423,6 +516,7 @@
       overflow: hidden;
       box-shadow: var(--shadow-md);
       background: transparent;
+      cursor: pointer;
     }
 
     /* 원본 해상도 width ≥ 960px 인 영상은 항상 960px 너비로 표시 */
@@ -496,6 +590,40 @@
     .controls-progress {
       flex-shrink: 0;
       padding: 0.125rem 0;
+    }
+
+    /* 시크바 위 챕터 마커 (시각 표시 전용, 입력 방해 없음) */
+    .seek-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .chapter-markers {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .chapter-marker {
+      position: absolute;
+      top: 0;
+      transform: translate(-50%, -50%);
+      width: 3px;
+      height: 11px;
+      border-radius: 2px;
+      background: var(--accent-muted);
+      box-shadow: 0 0 0 1.5px var(--surface);
+      opacity: 0.55;
+      transition: opacity var(--duration) var(--ease), height var(--duration) var(--ease), background var(--duration) var(--ease);
+    }
+
+    .chapter-marker.is-active {
+      opacity: 1;
+      height: 14px;
+      background: var(--accent);
     }
 
     .controls-toolbar {
@@ -664,6 +792,23 @@
     .pdf-card-title {
       font-size: 0.9375rem;
       font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pdf-card-icon {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      flex: 0 0 auto;
+    }
+
+    .pdf-card-icon svg {
+      width: 24px;
+      height: 24px;
     }
 
     .pdf-card-chevron {
@@ -927,6 +1072,8 @@
       <h2 id="player-title" class="player-title"></h2>
     </header>
     <main class="player-main">
+      <div class="player-stage">
+        <div class="player-primary">
       <div class="video-wrap" id="video-wrap">
         <img id="player-poster" class="player-poster" alt="" hidden>
         <video id="player-video" playsinline preload="none"></video>
@@ -934,7 +1081,10 @@
       </div>
       <div class="controls-dock">
         <div class="controls-progress">
-          <input type="range" id="seek-bar" class="seek-bar" min="0" max="100" value="0" step="0.01" aria-label="재생 위치">
+          <div class="seek-wrap">
+            <input type="range" id="seek-bar" class="seek-bar" min="0" max="100" value="0" step="0.01" aria-label="재생 위치">
+            <div id="chapter-markers" class="chapter-markers" aria-hidden="true"></div>
+          </div>
         </div>
         <div class="controls-toolbar">
           <button type="button" id="btn-play" class="btn-play" aria-label="재생">
@@ -956,13 +1106,22 @@
           </div>
         </div>
       </div>
+        </div>
 
       <section id="pdf-section" class="pdf-panel" hidden aria-label="과제 설명 PDF">
-        <button type="button" id="pdf-card-toggle" class="pdf-card-header" aria-expanded="false" aria-controls="pdf-card-body">
+        <button type="button" id="pdf-card-toggle" class="pdf-card-header" aria-expanded="false" aria-controls="pdf-card-body" aria-label="과제 설명 PDF">
+          <span class="pdf-card-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="13" y2="17"/>
+            </svg>
+          </span>
           <span class="pdf-card-title">과제 설명 (PDF)</span>
           <span class="pdf-card-chevron" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="6 9 12 15 18 9"/>
+              <polyline points="9 6 15 12 9 18"/>
             </svg>
           </span>
         </button>
@@ -980,6 +1139,7 @@
           </div>
         </div>
       </section>
+      </div>
     </main>
   </div>
 
@@ -1021,7 +1181,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       bufferCallbacks: [],
       videoSourceAttached: null,
       videoReady: false,
-      loadingDefaultText: '불러오는 중…'
+      loadingDefaultText: '불러오는 중…',
+      hasInternalHistory: false
     };
 
     /** 세션 내 Blob URL (목록 복귀 시 재사용, 새로고침 전까지) */
@@ -1132,6 +1293,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       speedButtons: document.querySelectorAll('.btn-speed'),
       chaptersSection: document.getElementById('chapters-section'),
       chaptersList: document.getElementById('chapters-list'),
+      chapterMarkers: document.getElementById('chapter-markers'),
       playerMain: document.querySelector('.player-main'),
       pdfSection: document.getElementById('pdf-section'),
       pdfCardToggle: document.getElementById('pdf-card-toggle'),
@@ -1146,6 +1308,12 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
     function stripExtension(name) {
       return name.replace(/\.[^.]+$/, '');
+    }
+
+    /** 영상 식별용 슬러그 (파일명 기준, 경로/확장자 제거) — 딥링크 #video= 값 */
+    function slugify(name) {
+      var base = String(name || '').split('/').pop();
+      return stripExtension(base);
     }
 
     function formatTime(seconds) {
@@ -1163,6 +1331,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
               name: entry,
               title: stripExtension(entry),
               src: entry,
+              slug: slugify(entry),
               source: 'embedded'
             };
           }
@@ -1170,6 +1339,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             name: entry.file,
             title: entry.title,
             src: entry.file,
+            slug: slugify(entry.file),
             pdf: entry.pdf || null,
             pdfPages: entry.pdfPages || null,
             source: 'embedded'
@@ -1232,6 +1402,116 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       }
     };
 
+    /**
+     * 해시 기반 딥링크 라우팅.
+     * 형식: #video=<slug>&t=<초>&pdf
+     *  - 카드 클릭 → location.hash 갱신(히스토리 push) → hashchange → apply()
+     *  - 재생 위치/ PDF 펼침 상태는 replaceState 로 URL 에 반영(히스토리 미증가, 북마크 재개용)
+     */
+    var routing = {
+      lastWrittenTime: -1,
+
+      parse: function () {
+        var raw = location.hash.replace(/^#/, '');
+        if (!raw) return null;
+        var params = {};
+        raw.split('&').forEach(function (pair) {
+          if (!pair) return;
+          var eq = pair.indexOf('=');
+          var key = decodeURIComponent(eq === -1 ? pair : pair.slice(0, eq));
+          var val = eq === -1 ? '' : decodeURIComponent(pair.slice(eq + 1));
+          if (key) params[key] = val;
+        });
+        return params;
+      },
+
+      findIndexBySlug: function (slug) {
+        for (var i = 0; i < state.videos.length; i++) {
+          if (state.videos[i].slug === slug) return i;
+        }
+        return -1;
+      },
+
+      /** 현재 해시를 읽어 해당 뷰로 동기화 (초기 로드 + hashchange) */
+      apply: function () {
+        this.lastWrittenTime = -1;
+        var params = this.parse();
+        if (!params || !params.video) {
+          router.showDashboard();
+          return;
+        }
+        var index = this.findIndexBySlug(params.video);
+        if (index < 0) {
+          router.showDashboard();
+          return;
+        }
+        router.showPlayer(index);
+        var video = state.videos[index];
+        if ('pdf' in params && video.pdf) {
+          pdfViewer.expand();
+        }
+        var t = parseFloat(params.t);
+        if (isFinite(t) && t > 0) {
+          player.seekToTime(t, false);
+        }
+      },
+
+      /** 영상 진입(히스토리 push). slug 없는 로컬(picker) 영상은 직접 표시 */
+      goToVideo: function (index) {
+        var video = state.videos[index];
+        if (video && video.slug) {
+          state.hasInternalHistory = true;
+          location.hash = 'video=' + encodeURIComponent(video.slug);
+        } else {
+          router.showPlayer(index);
+        }
+      },
+
+      /** 목록 복귀: 내부 히스토리가 있으면 뒤로가기, 아니면 해시 비우기 */
+      goToDashboard: function () {
+        if (location.hash) {
+          if (state.hasInternalHistory) {
+            history.back();
+          } else {
+            location.hash = '';
+          }
+        } else {
+          router.showDashboard();
+        }
+      },
+
+      /** 현재 플레이어 상태(영상/시간/PDF)를 URL 에 반영 — 히스토리 증가 없음 */
+      writeState: function () {
+        if (state.currentIndex < 0) return;
+        var video = state.videos[state.currentIndex];
+        if (!video || !video.slug) return;
+        if (!els.viewPlayer.classList.contains('is-active')) return;
+        var parts = 'video=' + encodeURIComponent(video.slug);
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t > 0) parts += '&t=' + t;
+        if (pdfViewer.expanded) parts += '&pdf';
+        try {
+          history.replaceState(null, '', '#' + parts);
+        } catch (e) { /* ignore */ }
+      },
+
+      /** 재생 중 정수 초가 바뀔 때만 URL 시간 갱신 (북마크 재개) */
+      syncTime: function () {
+        if (state.currentIndex < 0) return;
+        var t = Math.floor(els.playerVideo.currentTime || 0);
+        if (t === this.lastWrittenTime) return;
+        this.lastWrittenTime = t;
+        this.writeState();
+      },
+
+      bind: function () {
+        var self = this;
+        window.addEventListener('hashchange', function () {
+          self.apply();
+        });
+      }
+    };
+
     var pdfViewer = {
       doc: null,
       pendingPath: null,
@@ -1257,6 +1537,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.pdfCardToggle.setAttribute('aria-expanded', 'false');
         els.playerMain.classList.add('has-pdf');
         els.pdfPageInfo.textContent = '1 / —';
+        player.syncFabPosition();
       },
 
       toggleExpand: function () {
@@ -1271,15 +1552,25 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         this.expanded = true;
         els.pdfCardBody.hidden = false;
         els.pdfCardToggle.setAttribute('aria-expanded', 'true');
+        els.playerMain.classList.add('is-pdf-open');
+        player.syncFabPosition();
         if (!this.doc && this.pendingPath) {
           this.loadDocument(this.pendingPath);
+        } else if (this.doc) {
+          // 좌우 분할로 컨테이너 크기가 바뀌므로 레이아웃 반영 후 재렌더
+          var self = this;
+          requestAnimationFrame(function () { self.renderPage(); });
         }
+        routing.writeState();
       },
 
       collapse: function () {
         this.expanded = false;
         els.pdfCardBody.hidden = true;
         els.pdfCardToggle.setAttribute('aria-expanded', 'false');
+        els.playerMain.classList.remove('is-pdf-open');
+        player.syncFabPosition();
+        routing.writeState();
       },
 
       loadDocument: function (path) {
@@ -1422,6 +1713,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           self.next();
         });
         window.addEventListener('resize', function () {
+          player.syncFabPosition();
           if (els.pdfSection.hidden || !self.doc || !self.expanded) return;
           self.renderPage();
         });
@@ -1501,7 +1793,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           }
 
           card.addEventListener('click', function () {
-            router.showPlayer(index);
+            routing.goToVideo(index);
           });
 
           els.cardGrid.appendChild(card);
@@ -1579,7 +1871,25 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.chaptersList.appendChild(btn);
         });
 
+        this.renderMarkers();
         this.updateActive(0);
+      },
+
+      /** 영상 길이를 알게 된 시점에 시크바 위 챕터 마커를 배치 (퍼센트 기준) */
+      renderMarkers: function () {
+        var container = els.chapterMarkers;
+        if (!container) return;
+        container.innerHTML = '';
+        var duration = els.playerVideo.duration;
+        if (this.items.length === 0 || !isFinite(duration) || duration <= 0) return;
+        this.items.forEach(function (chapter, index) {
+          var pct = Math.max(0, Math.min(100, (chapter.time / duration) * 100));
+          var mark = document.createElement('span');
+          mark.className = 'chapter-marker';
+          mark.style.left = pct + '%';
+          mark.dataset.index = String(index);
+          container.appendChild(mark);
+        });
       },
 
       seekTo: function (index) {
@@ -1609,12 +1919,20 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
           }
         });
+
+        if (els.chapterMarkers) {
+          var marks = els.chapterMarkers.querySelectorAll('.chapter-marker');
+          marks.forEach(function (mark, i) {
+            mark.classList.toggle('is-active', i === activeIndex);
+          });
+        }
       },
 
       clear: function () {
         this.items = [];
         els.chaptersList.innerHTML = '';
         els.chaptersSection.hidden = true;
+        if (els.chapterMarkers) els.chapterMarkers.innerHTML = '';
       }
     };
 
@@ -1646,6 +1964,21 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.videoWrap.classList.add('is-hd-wide');
         } else {
           els.videoWrap.classList.remove('is-hd-wide');
+        }
+        this.syncFabPosition();
+      },
+
+      /** 접힘 상태의 PDF FAB를 영상 세로 중앙에 맞춘다 (영상 높이로 컨테이너 높이 동기화) */
+      syncFabPosition: function () {
+        var section = els.pdfSection;
+        if (!section || section.hidden) return;
+        var desktop = window.matchMedia('(min-width: 1024px)').matches;
+        var collapsed = !els.playerMain.classList.contains('is-pdf-open');
+        if (desktop && collapsed) {
+          var h = els.videoWrap.getBoundingClientRect().height;
+          if (h > 0) section.style.height = h + 'px';
+        } else {
+          section.style.removeProperty('height');
         }
       },
 
@@ -1970,6 +2303,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         if (d > 0) {
           els.seekBar.max = String(d);
           els.seekBar.disabled = false;
+          chapters.renderMarkers();
         }
       },
 
@@ -1994,6 +2328,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           v.muted = false;
           self.updateSeek();
           chapters.updateActive(v.currentTime);
+          routing.syncTime();
           els.playerLoading.hidden = true;
           if (shouldPlay) {
             v.play().catch(function () {});
@@ -2059,10 +2394,14 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         var self = this;
 
         els.btnBack.addEventListener('click', function () {
-          router.showDashboard();
+          routing.goToDashboard();
         });
 
         els.btnPlay.addEventListener('click', function () {
+          self.togglePlay();
+        });
+
+        els.videoWrap.addEventListener('click', function () {
           self.togglePlay();
         });
 
@@ -2096,6 +2435,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.playerVideo.addEventListener('timeupdate', function () {
           self.updateSeek();
           chapters.updateActive(els.playerVideo.currentTime);
+          routing.syncTime();
         });
 
         els.playerVideo.addEventListener('ended', function () {
@@ -2123,7 +2463,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
         document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape' && els.viewPlayer.classList.contains('is-active')) {
-            router.showDashboard();
+            routing.goToDashboard();
           }
           if (e.key === ' ' && els.viewPlayer.classList.contains('is-active') &&
               document.activeElement && document.activeElement.tagName !== 'INPUT') {
@@ -2155,10 +2495,14 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       speed.bind();
       player.bind();
       pdfViewer.bind();
+      routing.bind();
 
       if (state.videos.length === 0) {
         els.emptyState.hidden = false;
       }
+
+      // 초기 해시(#video=…)가 있으면 해당 영상으로 바로 진입
+      routing.apply();
     }
 
     init();
