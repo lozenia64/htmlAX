@@ -631,6 +631,116 @@
       font-size: 0.9375rem;
     }
 
+    /* 스포트라이트(추천 시연) 히어로 */
+    .spotlight {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      min-height: clamp(240px, 30vw, 360px);
+      margin-bottom: clamp(2rem, 4vw, 2.75rem);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      background: linear-gradient(135deg, var(--accent-soft) 0%, #e4e4e7 100%);
+      cursor: pointer;
+      transition: box-shadow var(--duration) var(--ease), transform var(--duration) var(--ease);
+    }
+
+    .spotlight[hidden] {
+      display: none;
+    }
+
+    .spotlight:hover {
+      box-shadow: var(--shadow-hover);
+      transform: translateY(-2px);
+    }
+
+    .spotlight:hover .spotlight-bg {
+      transform: scale(1.03);
+    }
+
+    .spotlight:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .spotlight-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 500ms var(--ease);
+    }
+
+    .spotlight-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(15, 23, 42, 0.82) 0%, rgba(15, 23, 42, 0.5) 45%, rgba(15, 23, 42, 0.05) 100%);
+    }
+
+    .spotlight-content {
+      position: relative;
+      z-index: 1;
+      padding: clamp(1.5rem, 3vw, 2.5rem);
+      max-width: 42rem;
+      color: #fff;
+    }
+
+    .spotlight-eyebrow {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      margin-bottom: 0.875rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .spotlight-title {
+      margin: 0;
+      font-size: clamp(1.5rem, 2.5vw + 0.5rem, 2.25rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    .spotlight-meta {
+      margin: 0.75rem 0 0;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    .spotlight-cta {
+      margin-top: 1.25rem;
+      pointer-events: none;
+    }
+
+    /* 카테고리 레일 (이어보기 셸프 패턴 재사용) */
+    .browse-rails[hidden] {
+      display: none;
+    }
+
+    .rail {
+      margin-bottom: clamp(2rem, 4vw, 2.75rem);
+    }
+
+    /* 카드 메타(챕터/자료 안내) */
+    .card-meta {
+      margin: 0.4rem 0 0;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--text-muted);
+    }
+
     /* 카드 진행률 표시 */
     .card-progress {
       position: absolute;
@@ -1378,6 +1488,15 @@
       }
     }
 
+    /* 대시보드 ↔ 플레이어 전환 크로스페이드 (View Transitions API) */
+    @media (prefers-reduced-motion: no-preference) {
+      ::view-transition-old(root),
+      ::view-transition-new(root) {
+        animation-duration: 260ms;
+        animation-timing-function: var(--ease);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
         animation-duration: 0.01ms !important;
@@ -1442,6 +1561,8 @@
         </label>
       </div>
 
+      <section id="spotlight" class="spotlight" role="button" tabindex="0" aria-label="추천 시연 영상 재생" hidden></section>
+
       <section id="continue-section" class="continue-section" aria-label="이어보기" hidden>
         <div class="section-head">
           <h2 class="section-title">이어보기</h2>
@@ -1449,6 +1570,8 @@
         </div>
         <div id="continue-row" class="continue-row" role="list"></div>
       </section>
+
+      <div id="browse-rails" class="browse-rails" hidden></div>
 
       <h2 id="grid-heading" class="section-title" hidden>전체 시연 영상</h2>
       <div id="card-grid" class="card-grid" role="list"></div>
@@ -1694,6 +1817,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       searchClear: document.getElementById('search-clear'),
       categoryChips: document.getElementById('category-chips'),
       sortSelect: document.getElementById('sort-select'),
+      spotlight: document.getElementById('spotlight'),
+      browseRails: document.getElementById('browse-rails'),
       continueSection: document.getElementById('continue-section'),
       continueRow: document.getElementById('continue-row'),
       continueClear: document.getElementById('continue-clear'),
@@ -1743,6 +1868,24 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       return m + ':' + String(s).padStart(2, '0');
     }
 
+    function prefersReducedMotion() {
+      try {
+        return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    /** 대시보드↔플레이어 전환을 크로스페이드로 감싼다(미지원/초기로드/감속 선호 시 즉시 실행). */
+    var viewReady = false;
+    function runViewTransition(updateFn) {
+      if (viewReady && typeof document.startViewTransition === 'function' && !prefersReducedMotion()) {
+        document.startViewTransition(updateFn);
+      } else {
+        updateFn();
+      }
+    }
+
     var catalog = {
       fromEmbedded: function (entries) {
         return entries.map(function (entry) {
@@ -1764,6 +1907,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             pdfPages: entry.pdfPages || null,
             category: entry.category || null,
             tags: Array.isArray(entry.tags) ? entry.tags : [],
+            featured: entry.featured === true,
             source: 'embedded'
           };
         });
@@ -1794,8 +1938,6 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
     var router = {
       showDashboard: function () {
-        els.viewDashboard.classList.add('is-active');
-        els.viewPlayer.classList.remove('is-active');
         player.pause();
         player.cleanup();
         state.pendingSrc = null;
@@ -1803,8 +1945,12 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         state.metadataReady = false;
         els.playerLoading.hidden = true;
         pdfViewer.close();
-        // 시청 진행률(이어보기/진행바)을 최신 상태로 다시 그림
+        // 시청 진행률(이어보기/진행바)을 최신 상태로 다시 그림 (전환 캡처 전에 미리 렌더)
         dashboard.render();
+        runViewTransition(function () {
+          els.viewDashboard.classList.add('is-active');
+          els.viewPlayer.classList.remove('is-active');
+        });
       },
 
       showPlayer: function (index) {
@@ -1813,8 +1959,6 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         if (!video) return;
         progress.lastSavedT = -1;
 
-        els.viewDashboard.classList.remove('is-active');
-        els.viewPlayer.classList.add('is-active');
         els.playerTitle.textContent = video.title;
 
         player.cleanup();
@@ -1826,6 +1970,11 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         player.showPoster(video);
         els.playerLoading.hidden = true;
         pdfViewer.setup(video.pdf);
+
+        runViewTransition(function () {
+          els.viewDashboard.classList.remove('is-active');
+          els.viewPlayer.classList.add('is-active');
+        });
       }
     };
 
@@ -2267,6 +2416,25 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         return '<div class="thumb-fallback" aria-hidden="true">' + icon + '</div>';
       },
 
+      /** 챕터 수·자료 분량 등 고객에게 유용한 기대치 안내 문구 (다운로드 정보는 제외) */
+      metaText: function (video) {
+        var parts = [];
+        var chs = (typeof CHAPTERS !== 'undefined' && CHAPTERS[video.name]) ? CHAPTERS[video.name].length : 0;
+        if (chs > 0) parts.push('챕터 ' + chs + '개');
+        if (video.pdf) {
+          parts.push(video.pdfPages ? '자료 ' + video.pdfPages + '쪽' : 'PDF 자료');
+        }
+        return parts.join(' · ');
+      },
+
+      /** 추천(스포트라이트) 영상 인덱스 — featured 지정분 우선, 없으면 첫 영상 */
+      featuredIndex: function () {
+        for (var i = 0; i < state.videos.length; i++) {
+          if (state.videos[i].featured) return i;
+        }
+        return state.videos.length > 0 ? 0 : -1;
+      },
+
       /** 카드 1장 생성 (그리드/이어보기 공용). index 는 state.videos 원본 인덱스 */
       createCard: function (video, index) {
         var card = document.createElement('button');
@@ -2278,6 +2446,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
         var ratio = video.slug ? progress.ratio(video.slug) : null;
         var done = video.slug ? progress.isDone(video.slug) : false;
+        var metaText = this.metaText(video);
 
         var statusHtml = '';
         if (done) {
@@ -2311,9 +2480,12 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
             '<span class="card-cache" hidden></span>' +
             progressHtml +
           '</div>' +
-          '<div class="card-body"><p class="card-title"></p></div>';
+          '<div class="card-body"><p class="card-title"></p>' +
+            (metaText ? '<p class="card-meta"></p>' : '') +
+          '</div>';
 
         card.querySelector('.card-title').textContent = video.title;
+        if (metaText) card.querySelector('.card-meta').textContent = metaText;
 
         var img = card.querySelector('img');
         if (img) {
@@ -2434,6 +2606,86 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         this.refreshCacheBadges();
       },
 
+      /** 상단 스포트라이트(추천 시연) 렌더 */
+      renderSpotlight: function (show) {
+        var idx = show ? this.featuredIndex() : -1;
+        if (idx < 0) {
+          els.spotlight.hidden = true;
+          els.spotlight.innerHTML = '';
+          return;
+        }
+        var video = state.videos[idx];
+        var posterSrc =
+          (typeof POSTERS !== 'undefined' && POSTERS[video.name]) ||
+          (typeof THUMBNAILS !== 'undefined' && THUMBNAILS[video.name]) || '';
+        var meta = this.metaText(video);
+
+        els.spotlight.innerHTML =
+          (posterSrc ? '<img class="spotlight-bg" alt="" src="' + posterSrc + '">' : '') +
+          '<div class="spotlight-overlay" aria-hidden="true"></div>' +
+          '<div class="spotlight-content">' +
+            '<span class="spotlight-eyebrow"></span>' +
+            '<h2 class="spotlight-title"></h2>' +
+            (meta ? '<p class="spotlight-meta"></p>' : '') +
+            '<span class="btn-primary spotlight-cta" aria-hidden="true">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>' +
+              '바로 보기' +
+            '</span>' +
+          '</div>';
+
+        els.spotlight.querySelector('.spotlight-eyebrow').textContent = video.category || '추천 시연';
+        els.spotlight.querySelector('.spotlight-title').textContent = video.title;
+        if (meta) els.spotlight.querySelector('.spotlight-meta').textContent = meta;
+        els.spotlight.setAttribute('aria-label', video.title + ' 재생');
+
+        var bg = els.spotlight.querySelector('.spotlight-bg');
+        if (bg) {
+          bg.addEventListener('error', function () { bg.hidden = true; });
+        }
+        els.spotlight.hidden = false;
+      },
+
+      /** 카테고리별 가로 레일 렌더 (이어보기 셸프 패턴 재사용). 카테고리 없는 영상은 '기타' */
+      renderRails: function (categories) {
+        var self = this;
+        els.browseRails.innerHTML = '';
+        var groups = categories.map(function (c) { return { label: c, items: [] }; });
+        var other = [];
+        state.videos.forEach(function (video, index) {
+          var placed = false;
+          for (var g = 0; g < groups.length; g++) {
+            if (groups[g].label === video.category) { groups[g].items.push(index); placed = true; break; }
+          }
+          if (!placed) other.push(index);
+        });
+        if (other.length) groups.push({ label: '기타', items: other });
+
+        groups.forEach(function (group) {
+          if (!group.items.length) return;
+          var section = document.createElement('section');
+          section.className = 'rail';
+          section.setAttribute('aria-label', group.label);
+
+          var head = document.createElement('div');
+          head.className = 'section-head';
+          var title = document.createElement('h2');
+          title.className = 'section-title';
+          title.textContent = group.label;
+          head.appendChild(title);
+          section.appendChild(head);
+
+          var row = document.createElement('div');
+          row.className = 'continue-row';
+          row.setAttribute('role', 'list');
+          group.items.forEach(function (index) {
+            row.appendChild(self.createCard(state.videos[index], index));
+          });
+          section.appendChild(row);
+          els.browseRails.appendChild(section);
+        });
+        els.browseRails.hidden = false;
+      },
+
       /** 현재 필터/정렬을 본 그리드에 반영 */
       applyFilters: function () {
         var self = this;
@@ -2473,6 +2725,42 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         this.refreshCacheBadges();
       },
 
+      /**
+       * 둘러보기(검색·필터 없음) 모드와 결과(검색·카테고리 선택) 모드를 구분해 레이아웃 결정.
+       * - 둘러보기 + 카테고리 2개 이상: 스포트라이트 + 이어보기 + 카테고리 레일
+       * - 그 외(검색/특정 카테고리 선택): 기존 평면 그리드
+       */
+      update: function () {
+        var count = state.videos.length;
+        var isBrowse = this.filter.query.trim() === '' && this.filter.category === 'all';
+        var categories = this.collectCategories();
+        var useRails = isBrowse && categories.length >= 2;
+
+        this.renderSpotlight(isBrowse && count >= 2);
+
+        if (isBrowse) {
+          this.renderContinue();
+        } else {
+          els.continueSection.hidden = true;
+        }
+
+        if (useRails) {
+          this.renderRails(categories);
+          els.cardGrid.innerHTML = '';
+          els.cardGrid.hidden = true;
+          els.gridHeading.hidden = true;
+          els.noResults.hidden = true;
+          els.statsCount.textContent = '총 ' + count + '개 시연 영상';
+        } else {
+          els.browseRails.hidden = true;
+          els.browseRails.innerHTML = '';
+          this.applyFilters();
+          // 평면 그리드 위에 스포트라이트/이어보기가 있을 때만 '전체 시연 영상' 라벨 노출
+          var hasAbove = !els.spotlight.hidden || !els.continueSection.hidden;
+          els.gridHeading.hidden = !(isBrowse && hasAbove && !els.cardGrid.hidden);
+        }
+      },
+
       render: function () {
         var count = state.videos.length;
 
@@ -2480,7 +2768,9 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           els.emptyState.hidden = false;
           els.statsStrip.hidden = true;
           els.catalogToolbar.hidden = true;
+          els.spotlight.hidden = true;
           els.continueSection.hidden = true;
+          els.browseRails.hidden = true;
           els.gridHeading.hidden = true;
           els.noResults.hidden = true;
           els.cardGrid.hidden = false;
@@ -2500,12 +2790,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.catalogToolbar.hidden = count < 2;
 
         this.renderCategoryChips(categories);
-        this.renderContinue();
-
-        // 이어보기 셸프가 보이면 본 그리드에 구분 제목 노출
-        els.gridHeading.hidden = els.continueSection.hidden;
-
-        this.applyFilters();
+        this.update();
         // 카드 캐시 핀(저장됨/미저장) 상태를 비동기로 반영
         if (!cacheManager.disabled) {
           cacheManager.refresh().then(function () {
@@ -2520,25 +2805,39 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.searchInput.addEventListener('input', function () {
           self.filter.query = els.searchInput.value;
           els.searchClear.hidden = els.searchInput.value === '';
-          self.applyFilters();
+          self.update();
         });
 
         els.searchClear.addEventListener('click', function () {
           els.searchInput.value = '';
           self.filter.query = '';
           els.searchClear.hidden = true;
-          self.applyFilters();
+          self.update();
           els.searchInput.focus();
         });
 
         els.sortSelect.addEventListener('change', function () {
           self.filter.sort = els.sortSelect.value;
-          self.applyFilters();
+          self.update();
         });
 
         els.continueClear.addEventListener('click', function () {
           progress.clearAll();
           self.render();
+        });
+
+        // 스포트라이트(추천 시연) 클릭/키보드로 바로 재생
+        function openSpotlight() {
+          if (els.spotlight.hidden) return;
+          var idx = self.featuredIndex();
+          if (idx >= 0) routing.goToVideo(idx);
+        }
+        els.spotlight.addEventListener('click', openSpotlight);
+        els.spotlight.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            openSpotlight();
+          }
         });
       },
 
@@ -3281,6 +3580,9 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
       // 초기 해시(#video=…)가 있으면 해당 영상으로 바로 진입
       routing.apply();
+
+      // 초기 렌더 이후부터 화면 전환 애니메이션 활성화 (로드 시 깜빡임 방지)
+      viewReady = true;
     }
 
     init();
