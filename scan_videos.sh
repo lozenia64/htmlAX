@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scan_videos.sh — index.html에 VIDEOS·CHAPTERS·THUMBNAILS 배열 주입
+# scan_videos.sh — ax.html에 VIDEOS·CHAPTERS·THUMBNAILS 배열 주입
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
