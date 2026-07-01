@@ -97,6 +97,18 @@ strip_extension() {
   printf '%s' "${name%.*}"
 }
 
+# videos.csv 의 영문명(base name)으로 mp4/ 안의 실제 영상 파일을 찾는다.
+find_video_file_for_base() {
+  local base=$1 ext
+  for ext in mp4 webm ogg mov; do
+    if [[ -f "$MP4_DIR/${base}.${ext}" ]]; then
+      printf '%s' "${base}.${ext}"
+      return 0
+    fi
+  done
+  return 1
+}
+
 # video_files[i] = mp4/… path; video_titles[i] = Korean title; video_pdfs[i] = pdf/… or empty
 video_files=()
 video_titles=()
@@ -132,29 +144,32 @@ resolve_pdf_for_video() {
   video_pdf_pages+=("${pages:-}")
 }
 
+# videos.csv 형식: 한글명,영문명
+# - 한글명: ax.html에 표시되는 과제명
+# - 영문명: mp4/·pdf/·thumbs/·posters/ 안의 파일을 찾을 때 쓰는 공통 베이스명
+#   (예: 영문명이 mcp-e2e-platform 이면 mp4/mcp-e2e-platform.mp4,
+#        pdf/mcp-e2e-platform.pdf, thumbs·posters/mcp-e2e-platform.jpg 를 자동으로 찾는다)
 load_videos_from_csv() {
-  local csv=$1 line file title pdf_name
+  local csv=$1 line row_num=0 title file_base file
   while IFS= read -r line || [[ -n "$line" ]]; do
     line=${line//$'\r'/}
     [[ -z "$line" ]] && continue
-    [[ "$line" == file,* ]] && continue
-    IFS=',' read -r file title pdf_name <<<"$line"
-    file=${file#"${file%%[![:space:]]*}"}
-    file=${file%"${file##*[![:space:]]}"}
+    row_num=$((row_num + 1))
+    ((row_num == 1)) && continue
+    IFS=',' read -r title file_base <<<"$line"
     title=${title#"${title%%[![:space:]]*}"}
     title=${title%"${title##*[![:space:]]}"}
-    pdf_name=${pdf_name#"${pdf_name%%[![:space:]]*}"}
-    pdf_name=${pdf_name%"${pdf_name##*[![:space:]]}"}
-    [[ -z "$file" || -z "$title" ]] && continue
-    file=$(basename "$file")
-    local rel="mp4/$file"
-    if [[ ! -f "$MP4_DIR/$file" ]]; then
-      printf 'videos.csv: mp4/ 에 파일이 없습니다 — %s\n' "$file" >&2
+    file_base=${file_base#"${file_base%%[![:space:]]*}"}
+    file_base=${file_base%"${file_base##*[![:space:]]}"}
+    [[ -z "$title" || -z "$file_base" ]] && continue
+    file_base=$(basename "$file_base")
+    if ! file=$(find_video_file_for_base "$file_base"); then
+      printf 'videos.csv: mp4/ 에 %s.{mp4,webm,ogg,mov} 파일이 없습니다\n' "$file_base" >&2
       exit 1
     fi
-    video_files+=("$rel")
+    video_files+=("mp4/$file")
     video_titles+=("$title")
-    resolve_pdf_for_video "$file" "$pdf_name"
+    resolve_pdf_for_video "$file" ""
   done <"$csv"
 }
 

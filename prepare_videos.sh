@@ -14,7 +14,6 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 MP4_DIR="$SCRIPT_DIR/mp4"
-VIDEOS_CSV="$SCRIPT_DIR/videos.csv"
 
 if ! command -v ffmpeg >/dev/null 2>&1; then
   printf 'ffmpeg가 필요합니다. macOS: brew install ffmpeg\n' >&2
@@ -45,11 +44,6 @@ process_file() {
   if [[ "$f" != "$out" && -f "$f" ]]; then
     rm -f "$f"
     printf '  원본 삭제: %s\n' "$f"
-  fi
-
-  if [[ -f "$VIDEOS_CSV" ]] && grep -qF "${base}.${ext}" "$VIDEOS_CSV"; then
-    sed -i '' "s|${base}\.${ext}|${base}.mp4|g" "$VIDEOS_CSV"
-    printf '  videos.csv 갱신: %s → %s\n' "${base}.${ext}" "${base}.mp4"
   fi
 
   count=$((count + 1))
