@@ -1679,7 +1679,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       videoSourceAttached: null,
       videoReady: false,
       loadingDefaultText: '불러오는 중…',
-      hasInternalHistory: false
+      hasInternalHistory: false,
+      waitingOverlayTimer: null
     };
 
     /** 세션 내 Blob URL (목록 복귀 시 재사용, 새로고침 전까지) */
@@ -2645,6 +2646,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
     var chapters = {
       items: [],
+      activeIndex: -1,
 
       render: function (videoName) {
         var list = (typeof CHAPTERS !== 'undefined' && CHAPTERS[videoName]) ? CHAPTERS[videoName] : null;
@@ -2657,6 +2659,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         }
 
         els.chaptersSection.hidden = false;
+        this.activeIndex = -1;
         this.items = list.slice().sort(function (a, b) {
           return a.time - b.time;
         });
@@ -2726,6 +2729,10 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           }
         }
 
+        // 활성 챕터가 바뀔 때만 DOM 갱신 (timeupdate마다 scrollIntoView 반복 방지)
+        if (activeIndex === this.activeIndex) return;
+        this.activeIndex = activeIndex;
+
         var buttons = els.chaptersList.querySelectorAll('.btn-chapter');
         buttons.forEach(function (btn, i) {
           var isActive = i === activeIndex;
@@ -2746,6 +2753,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
 
       clear: function () {
         this.items = [];
+        this.activeIndex = -1;
         els.chaptersList.innerHTML = '';
         els.chaptersSection.hidden = true;
         if (els.chapterMarkers) els.chapterMarkers.innerHTML = '';
@@ -2853,11 +2861,20 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         els.playerLoading.textContent = text;
       },
 
+      /** waiting 지연 표시 타이머 취소 (재생 재개·정지·정리 시) */
+      cancelWaitingOverlay: function () {
+        if (state.waitingOverlayTimer) {
+          clearTimeout(state.waitingOverlayTimer);
+          state.waitingOverlayTimer = null;
+        }
+      },
+
       resetLoadingText: function () {
         els.playerLoading.textContent = state.loadingDefaultText;
       },
 
       cleanup: function () {
+        this.cancelWaitingOverlay();
         state.isBuffering = false;
         state.bufferCallbacks = [];
         state.videoSourceAttached = null;
@@ -3232,13 +3249,19 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           player.updateSeek();
         });
 
+        /* Blob 재생 중에도 배속(2×/3×) 디코드 언더플로로 waiting이 순간적으로 발생하므로,
+           짧은 정체에는 오버레이를 띄우지 않고 일정 시간 이상 지속될 때만 표시 */
         els.playerVideo.addEventListener('waiting', function () {
-          if (state.metadataReady) {
+          if (!state.metadataReady) return;
+          if (state.waitingOverlayTimer) return;
+          state.waitingOverlayTimer = setTimeout(function () {
+            state.waitingOverlayTimer = null;
             els.playerLoading.hidden = false;
-          }
+          }, 400);
         });
 
         els.playerVideo.addEventListener('playing', function () {
+          player.cancelWaitingOverlay();
           els.playerLoading.hidden = true;
           player.resetLoadingText();
           els.playerVideo.muted = false;
@@ -3250,6 +3273,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         });
 
         els.playerVideo.addEventListener('pause', function () {
+          player.cancelWaitingOverlay();
           self.updatePlayIcon();
         });
 
@@ -3264,6 +3288,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         });
 
         els.playerVideo.addEventListener('error', function () {
+          player.cancelWaitingOverlay();
           els.playerLoading.hidden = true;
           els.playerTitle.textContent += ' (재생 실패)';
         });
