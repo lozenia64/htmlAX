@@ -3073,7 +3073,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
       },
 
       /** 백그라운드 캐시가 시작된 원본 URL (중복 fetch 방지, 세션 내 유지) */
-      backgroundCacheKeys: {},
+      backgroundCacheKeys: Object.create(null),
 
       /**
        * 재생과 병행해 영상 전체를 받아 IndexedDB 에 저장 (UI 갱신 없음).
@@ -3089,12 +3089,19 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           if (!response.ok) {
             throw new Error('download failed');
           }
-          return self.fetchResponseToBlob(response, function () { /* 진행률 UI 없음 */ });
-        }).then(function (result) {
+          /* 진행률 UI가 없으므로 스트림 reader 대신 blob()으로 가볍게 수신 */
+          var total = parseInt(response.headers.get('Content-Length') || '0', 10);
+          return response.blob().then(function (blob) {
+            if (total > 0 && Math.abs(blob.size - total) > 4096) {
+              throw new Error('incomplete download');
+            }
+            return blob;
+          });
+        }).then(function (blob) {
           if (!sessionBlobUrls[key]) {
-            sessionBlobUrls[key] = URL.createObjectURL(result.blob);
+            sessionBlobUrls[key] = URL.createObjectURL(blob);
           }
-          return videoStore.put(key, result.blob, result.size);
+          return videoStore.put(key, blob, blob.size);
         }).catch(function () {
           /* 다음 재생 시 다시 시도할 수 있도록 표시 해제 */
           delete self.backgroundCacheKeys[key];
