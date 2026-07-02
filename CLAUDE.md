@@ -69,7 +69,7 @@ UI는 `ax.html` 안의 두 `<div class="view">`로만 구성되며, `is-active` 
 
 - **`state`**: 전역 상태(영상 목록, 현재 인덱스, 버퍼링/시킹 플래그 등).
 - **`routing` + `router`**: 해시 기반 딥링크. 형식 `#video=<slug>&t=<초>&pdf`. 카드 클릭 → `location.hash` 변경(히스토리 push) → `hashchange` → `routing.apply()` → `router.showPlayer()`. 재생 위치·PDF 펼침 상태는 `history.replaceState`로 URL에 계속 반영(히스토리 증가 없음, 북마크 재개용). slug는 파일명에서 경로·확장자를 뗀 값.
-- **영상 로딩 전략** (`player.prepareVideoSource`): 재생 시 영상 전체를 `fetch`로 다운로드(진행률 표시) → Blob URL로 재생하며, 동시에 **IndexedDB**(`mov-demo-videos`)에 영구 캐시. 재방문 시 IndexedDB → 세션 Blob URL 순으로 재사용하고, 다운로드 실패 시 원본 URL 직접 스트리밍으로 폴백. `file:` 프로토콜에서는 다운로드 없이 직접 재생.
+- **영상 로딩 전략** (`player.prepareVideoSource`): 캐시(세션 Blob URL → IndexedDB 순)가 있으면 재다운로드 없이 그대로 재생. 첫 재생은 원본 URL **즉시 프로그레시브 스트리밍**으로 시작하고(미래 구간 점프는 HTTP Range 요청으로 처리, faststart 전처리 전제), 동시에 백그라운드에서 전체를 `fetch`로 받아 **IndexedDB**(`mov-demo-videos`)에 영구 캐시(`player.cacheInBackground`, 키별 중복 fetch 방지 가드). 스트리밍 실패 시 전체 다운로드(진행률 표시) 후 Blob 재생으로 폴백. `file:` 프로토콜에서는 직접 재생.
 - **`videoStore`**: IndexedDB 래퍼. 저장 시 기대 크기를 함께 기록하고, 읽을 때 크기가 다르면 손상으로 보고 삭제.
 - **데이터 소스**: 주입된 `VIDEOS` 상수(embedded) + 폴더 선택으로 추가한 로컬 파일(picker, Blob URL). picker 영상은 slug가 없어 딥링크 대상이 아님.
 

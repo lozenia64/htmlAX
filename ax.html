@@ -2994,7 +2994,7 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         });
       },
 
-      attachMediaSource: function (mediaSrc) {
+      attachMediaSource: function (mediaSrc, streaming) {
         var self = this;
         var v = els.playerVideo;
         return new Promise(function (resolve, reject) {
@@ -3027,7 +3027,8 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
           }
 
           function onProgress() {
-            if (v.buffered.length > 0 && v.duration) {
+            /* 스트리밍 재생은 전체 버퍼링을 기다리지 않으므로 % 표시가 오해를 부름 */
+            if (!streaming && v.buffered.length > 0 && v.duration) {
               var buffered = v.buffered.end(v.buffered.length - 1);
               var pct = Math.min(100, Math.round((buffered / v.duration) * 100));
               self.setLoadingText('영상 준비 중… ' + pct + '%');
@@ -3071,7 +3072,49 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         }
       },
 
-      /** 영상 전체 다운로드(또는 캐시) 후 재생; 실패 시 직접 URL 스트리밍 폴백 */
+      /** 백그라운드 캐시가 시작된 원본 URL (중복 fetch 방지, 세션 내 유지) */
+      backgroundCacheKeys: Object.create(null),
+
+      /**
+       * 재생과 병행해 영상 전체를 받아 IndexedDB 에 저장 (UI 갱신 없음).
+       * 완료되면 이후 재생은 캐시(Blob)에서 재다운로드 없이 시작된다.
+       * 실패해도(오프라인·용량 부족 등) 진행 중인 스트리밍 재생에는 영향 없음.
+       */
+      cacheInBackground: function (key) {
+        var self = this;
+        if (!key || key.indexOf('blob:') === 0) return;
+        if (this.backgroundCacheKeys[key]) return;
+        this.backgroundCacheKeys[key] = true;
+        fetch(key).then(function (response) {
+          if (!response.ok) {
+            throw new Error('download failed');
+          }
+          /* 진행률 UI가 없으므로 스트림 reader 대신 blob()으로 가볍게 수신 */
+          var total = parseInt(response.headers.get('Content-Length') || '0', 10);
+          return response.blob().then(function (blob) {
+            if (total > 0 && Math.abs(blob.size - total) > 4096) {
+              throw new Error('incomplete download');
+            }
+            return blob;
+          });
+        }).then(function (blob) {
+          if (!sessionBlobUrls[key]) {
+            sessionBlobUrls[key] = URL.createObjectURL(blob);
+          }
+          return videoStore.put(key, blob, blob.size);
+        }).catch(function () {
+          /* 다음 재생 시 다시 시도할 수 있도록 표시 해제 */
+          delete self.backgroundCacheKeys[key];
+        });
+      },
+
+      /**
+       * 즉시 스트리밍으로 재생 시작:
+       *  - 캐시(세션 Blob → IndexedDB)가 있으면 재다운로드 없이 그대로 재생
+       *  - 첫 재생은 원본 URL 프로그레시브 스트리밍(미래 구간 점프는 HTTP Range 요청)
+       *    + 백그라운드 전체 다운로드로 IndexedDB 캐시 채움
+       *  - 스트리밍 실패 시 전체 다운로드(진행률 표시) 후 Blob 재생으로 폴백
+       */
       prepareVideoSource: function (callback) {
         var self = this;
         var key = state.pendingSrc;
@@ -3095,9 +3138,9 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         state.bufferCallbacks = [callback];
         els.playerLoading.hidden = false;
 
-        function runAttach(mediaSrc) {
+        function runAttach(mediaSrc, streaming) {
           state.videoSourceAttached = key;
-          return self.attachMediaSource(mediaSrc);
+          return self.attachMediaSource(mediaSrc, streaming);
         }
 
         if (location.protocol === 'file:') {
@@ -3113,20 +3156,23 @@ const POSTERS = {"mp4/mcp-e2e-platform.mp4":"posters/mcp-e2e-platform.jpg"};
         self.resolveBlobUrl(key).then(function (blobUrl) {
           if (blobUrl) {
             self.setLoadingText('저장된 영상 불러오는 중…');
-            return blobUrl;
+            return runAttach(blobUrl);
           }
-          return self.fetchAndCacheVideo(key);
-        }).then(function (mediaSrc) {
-          return runAttach(mediaSrc);
+          self.setLoadingText('영상 불러오는 중…');
+          return runAttach(key, true).then(function () {
+            self.cacheInBackground(key);
+          });
         }).then(function () {
           self.finishPrepare();
         }).catch(function () {
-          self.setLoadingText('직접 스트리밍으로 재생 중…');
-          return runAttach(key);
-        }).then(function () {
-          if (state.isBuffering) {
-            self.finishPrepare();
-          }
+          self.setLoadingText('영상 다운로드 중… 0%');
+          return self.fetchAndCacheVideo(key).then(function (mediaSrc) {
+            return runAttach(mediaSrc);
+          }).then(function () {
+            if (state.isBuffering) {
+              self.finishPrepare();
+            }
+          });
         }).catch(function () {
           self.failPrepare('다운로드 실패');
         });
